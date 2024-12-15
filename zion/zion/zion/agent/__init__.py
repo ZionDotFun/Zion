@@ -1,5 +1,7 @@
 from solana.rpc.async_api import AsyncClient
-from solders.keypair import Keypair
+from solana.keypair import Keypair
+from solana.publickey import PublicKey
+from base58 import b58decode
 
 class SolanaAgentKit:
     """
@@ -15,8 +17,8 @@ class SolanaAgentKit:
 
     def __init__(self, private_key: str, rpc_url: str = "https://api.mainnet-beta.solana.com", openai_api_key: str = ""):
         self.connection = AsyncClient(rpc_url)
-        self.wallet = Keypair.from_base58_string(private_key)
-        self.wallet_address = self.wallet.pubkey()
+        self.wallet = Keypair.from_secret_key(b58decode(private_key))
+        self.wallet_address = self.wallet.public_key
         self.openai_api_key = openai_api_key
 
     async def close_connection(self):
