@@ -1,1 +1,26 @@
-/var/folders/15/5nqgf_n51czb2vfntylx44tw4mppxx/T/repo_cache/60e8d4be8edcac3ef3e886a9d0096e31
+[tool.poetry]
+name = "agentipy"
+version = "0.1.0"
+description = ""
+authors = ["Muhammed Talha Korkmaz <kriptovekediler@gmail.com>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "3.13.0"
+solana = "0.36.1"
+requests = "2.32.3"
+python-dotenv = "1.0.1"
+numpy = "2.2.0"
+solders = "^0.23.0"
+base58 = "^2.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dev-dependencies]
+pytest = "8.3.4"
+black = "24.10.0"
+isort = "^5.10.0"
