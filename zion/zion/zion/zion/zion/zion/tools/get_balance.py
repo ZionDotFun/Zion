@@ -3,6 +3,7 @@ from solders.pubkey import Pubkey
 from solana.rpc.commitment import Confirmed
 from solana.rpc.types import TokenAccountOpts
 from solana.rpc.async_api import AsyncClient
+from solders.keypair import Keypair
 from solders.rpc.responses import GetTokenAccountsByOwnerResp
 from spl.token.constants import LAMPORTS_PER_SOL
 from agentipy.agent import SolanaAgentKit
