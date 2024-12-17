@@ -7,6 +7,8 @@ from solders.rpc.responses import GetTokenAccountsByOwnerResp
 from spl.token.constants import LAMPORTS_PER_SOL
 from agentipy.agent import SolanaAgentKit
 
+LAMPORTS_PER_SOL = 1000000000  # 1 SOL = 1 billion lamports
+
 async def get_balance(
     agent: SolanaAgentKit,
     token_address: Optional[Pubkey] = None
