@@ -18,3 +18,5 @@ DEFAULT_OPTIONS = {
 }
 
 JUP_API = "https://quote-api.jup.ag/v6"
+
+LAMPORTS_PER_SOL = 1_000_000_000
