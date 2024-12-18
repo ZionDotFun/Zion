@@ -1,7 +1,8 @@
 import math
 import logging
 
-from typing import Optional
+from typing import Optional, Dict, Any
+from dataclasses import dataclass
 
 from solders.pubkey import Pubkey
 from solders.transaction import Transaction
@@ -11,13 +12,22 @@ from solana.rpc.commitment import Confirmed
 
 from spl.token.async_client import AsyncToken
 from spl.token.constants import TOKEN_PROGRAM_ID, LAMPORTS_PER_SOL
-from spl.token.instructions import get_associated_token_address, transfer_checked
+from spl.token.instructions import get_associated_token_address, transfer as spl_transfer, transfer_checked
 
 
 from agentipy.agent import SolanaAgentKit
-from agentipy.types import TransferResult
+# from solana_agentkit.types.account import TransferParams, transfer
 
 logger = logging.getLogger(__name__)
+
+@dataclass
+class TransferResult:
+    """Result of a transfer operation."""
+    signature: str
+    from_address: str
+    to_address: str
+    amount: float
+    token: Optional[str] = None
 
 class SolanaTransferHelper:
     """Helper class for Solana token and SOL transfers."""
@@ -113,6 +123,7 @@ class SolanaTransferHelper:
             mint=spl_token,
         )
 
+        # Build and send the transaction
         transaction = Transaction().add(transfer_instruction)
         response = await rpc_client.send_transaction(transaction,
         [agent.wallet],
