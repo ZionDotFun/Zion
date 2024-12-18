@@ -68,29 +68,3 @@ class TokenDeploymentResult:
     """Result of a token deployment operation."""
     mint: Pubkey
     transaction_signature: str
-
-@dataclass
-class PumpFunTokenOptions:
-    """Options for launching a token on Pump.fun."""
-    twitter: Optional[str] = None
-    telegram: Optional[str] = None
-    website: Optional[str] = None
-    initial_liquidity_sol: float = 0.0001
-    slippage_bps: int = 5
-    priority_fee: float = 0.00005
-
-@dataclass
-class TokenLaunchResult:
-    """Result of a token launch operation."""
-    signature: str
-    mint: str
-    metadata_uri: str
-
-@dataclass
-class TransferResult:
-    """Result of a transfer operation."""
-    signature: str
-    from_address: str
-    to_address: str
-    amount: float
-    token: Optional[str] = None
