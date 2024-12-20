@@ -1,20 +1,13 @@
+import base58
 from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair
 from solders.pubkey import PublicKey
-import base58
-from agentipy.tools import (
-    request_faucet_funds,
-    deploy_token,
-    get_balance,
-    transfer,
-    trade,
-    launch_pumpfun_token,
-    lend,
-    get_tps,
-    stake_with_jup,
-)
+
 from agentipy.constants import DEFAULT_OPTIONS
-from agentipy.types import PumpfunTokenOptions 
+from agentipy.tools import (deploy_token, get_balance, get_tps,
+                            launch_pumpfun_token, lend, request_faucet_funds,
+                            stake_with_jup, trade, transfer)
+from agentipy.types import PumpfunTokenOptions
 
 
 class SolanaAgentKit:
@@ -35,7 +28,6 @@ class SolanaAgentKit:
         self.wallet_address = self.wallet.public_key
         self.openai_api_key = openai_api_key
 
-    # Tool methods
     async def request_faucet_funds(self):
         return await request_faucet_funds(self)
 

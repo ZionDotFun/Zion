@@ -1,9 +1,11 @@
-from solders.pubkey import Pubkey
 from solana.rpc.async_api import AsyncClient
-from solana.rpc.types import TokenAccountOpts
 from solana.rpc.commitment import Confirmed
 from solana.rpc.core import RPCException
-from spl.token.constants import LAMPORTS_PER_SOL
+from solana.rpc.types import TokenAccountOpts
+from solders.pubkey import Pubkey  # type: ignore
+
+from agentipy.constants import LAMPORTS_PER_SOL
+
 
 async def request_faucet_funds(agent) -> str:
     """
