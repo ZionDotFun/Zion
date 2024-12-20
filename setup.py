@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="agentipy",
-    version="0.1.0",
+    version="1.1.4",
     author="Utilify",
     author_email="hello@getutilify.com",
     description="A Python toolkit for Solana agents",
@@ -13,16 +13,11 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/niceberginc/agentipy",
     packages=find_packages(),
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.13.0",
+    python_requires=">=3.7",
     install_requires=[
         "requests==2.32.3",
         "python-dotenv==1.0.1",
-        "numpy==2.2.0",
+        "numpy==1.22.4,<2",
         "base58>=2.1.1",
         "aiohttp>=3.11.10",
         "pillow>=11.0.0",
@@ -30,6 +25,8 @@ setup(
         "solana>=0.36.1",
         "solders>=0.23.0",
         "pydantic>=2.10.4",
+        "langchain>=0.3.12",
+
     ],
     extras_require={
         "dev": [
@@ -37,11 +34,6 @@ setup(
             "black==24.10.0",
             "isort>=5.10.0",
         ]
-    },
-    entry_points={
-        'console_scripts': [
-            'agentipy-cli=agentipy.cli:main',
-        ],
     },
     classifiers=[
         "Programming Language :: Python :: 3",

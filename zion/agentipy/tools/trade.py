@@ -1,13 +1,13 @@
-import aiohttp
 import base64
-from solders.pubkey import Pubkey
-from solders.transaction import VersionedTransaction
+
+import aiohttp
 from solana.rpc.commitment import Confirmed
-from solana.rpc.async_api import AsyncClient
-from spl.token.constants import LAMPORTS_PER_SOL
+from solders.pubkey import Pubkey  # type: ignore
+from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
-from agentipy.constants import DEFAULT_OPTIONS, JUP_API, TOKENS
+from agentipy.constants import (DEFAULT_OPTIONS, JUP_API, LAMPORTS_PER_SOL,
+                                TOKENS)
 
 
 async def trade(
