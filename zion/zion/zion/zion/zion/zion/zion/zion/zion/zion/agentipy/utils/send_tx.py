@@ -1,11 +1,18 @@
+import json
 import requests
+import logging
+
 from solana.rpc.commitment import Confirmed
 from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair
-from solders.transaction import Transaction
+from solders.transaction import Transaction, VersionedTransaction
 from solders.pubkey import Pubkey
 from solders.instruction import Instruction
-from solders.compute_budget import set_compute_unit_limit, set_compute_unit_price
+from solders.compute_budget import set_compute_unit_price
+
+from agentipy.agent import SolanaAgentKit
+
+logger = logging.getLogger(__name__)
 
 url = "https://api.mainnet-beta.solana.com"
 headers = {"Content-Type": "application/json"}
@@ -91,7 +98,7 @@ async def get_priority_fees(connection: AsyncClient) -> dict:
         print("Error getting priority fees:", e)
         raise
 
-async def send_tx(agent, tx: Transaction, other_keypairs: list[Keypair] = None) -> str:
+async def send_tx(agent:SolanaAgentKit, tx: Transaction, other_keypairs: list[Keypair] = None) -> str:
     """
     Send a transaction with priority fees.
 
@@ -128,4 +135,51 @@ async def send_tx(agent, tx: Transaction, other_keypairs: list[Keypair] = None) 
         return tx_id
     except Exception as e:
         print("Error sending transaction:", e)
+        raise
+
+async def sign_and_send_transaction(
+    agent: SolanaAgentKit,
+    tx: VersionedTransaction,
+    mint_keypair: Keypair
+) -> str:
+    """
+    Sign and send transaction with proper error handling.
+    
+    Args:
+        agent: SolanaAgentKit instance
+        tx: Transaction to send
+        mint_keypair: Keypair for the token mint
+        
+    Returns:
+        Transaction signature
+    """
+    try:
+        recent_blockhash = await agent.connection.get_latest_blockhash()
+        
+        tx.message.recent_blockhash = recent_blockhash.value.blockhash
+        
+        tx.sign([mint_keypair, agent.wallet])
+        
+        signature = await agent.connection.send_transaction(
+            tx,
+            [agent.wallet, mint_keypair],
+            opts={
+                "skip_preflight": False,
+                "preflight_commitment": Confirmed,
+                "max_retries": 5
+            }
+        )
+        
+        confirmation = await agent.connection.confirm_transaction(
+            signature,
+            commitment=Confirmed
+        )
+        
+        if confirmation.value.err:
+            raise Exception(f"Transaction failed: {confirmation.value.err}")
+            
+        return str(signature)
+        
+    except Exception as error:
+        logger.error(f"Transaction error: {error}")
         raise
