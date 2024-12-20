@@ -43,7 +43,7 @@ async def deploy_token(agent:SolanaAgentKit, decimals: int = 9) -> Dict[str, Any
     try:
         
         mint = Keypair()
-        logger.info(f"Generated mint address: {mint.public_key}")
+        logger.info(f"Generated mint address: {mint.pubkey()}")
 
         
         lamports = await get_minimum_balance_for_rent_exemption(agent.connection)
@@ -52,7 +52,7 @@ async def deploy_token(agent:SolanaAgentKit, decimals: int = 9) -> Dict[str, Any
         create_account_ix = create_account(
             CreateAccountParams(
                 from_pubkey=agent.wallet_address,
-                to_pubkey=mint.public_key,
+                to_pubkey=mint.pubkey(),
                 lamports=lamports,
                 space=MINT_LEN,
                 program_id=TOKEN_PROGRAM_ID,
@@ -61,7 +61,7 @@ async def deploy_token(agent:SolanaAgentKit, decimals: int = 9) -> Dict[str, Any
 
         initialize_mint_ix = initialize_mint(
             program_id=TOKEN_PROGRAM_ID,
-            mint=mint.public_key,
+            mint=mint.pubkey(),
             decimals=decimals,
             mint_authority=Pubkey.from_string(agent.wallet_address),
             freeze_authority=Pubkey.from_string(agent.wallet_address),
@@ -77,7 +77,7 @@ async def deploy_token(agent:SolanaAgentKit, decimals: int = 9) -> Dict[str, Any
         logger.info(f"Transaction Signature: {tx_signature}")
 
         return {
-            "mint": str(mint.public_key),
+            "mint": str(mint.pubkey()),
             "signature": tx_signature,
         }
 

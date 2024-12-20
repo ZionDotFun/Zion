@@ -100,7 +100,7 @@ async def create_token_transaction(
             "symbol": metadata_response["metadata"]["symbol"],
             "uri": metadata_response["metadataUri"],
         },
-        "mint": str(mint_keypair.public_key),
+        "mint": str(mint_keypair.pubkey()),
         "denominatedInSol": "true",
         "amount": options.initial_liquidity_sol,
         "slippage": options.slippage_bps,
@@ -145,7 +145,7 @@ async def launch_pumpfun_token(
         logger.info("Starting token launch process...")
         
         mint_keypair = Keypair()
-        logger.info(f"Mint public key: {mint_keypair.public_key}")
+        logger.info(f"Mint public key: {mint_keypair.pubkey()}")
         
         logger.info("Uploading metadata to IPFS...")
         metadata_response = await upload_metadata(
@@ -172,7 +172,7 @@ async def launch_pumpfun_token(
         logger.info("Token launch successful!")
         return TokenLaunchResult(
             signature=signature,
-            mint=str(mint_keypair.public_key),
+            mint=str(mint_keypair.pubkey()),
             metadata_uri=metadata_response["metadataUri"]
         )
         

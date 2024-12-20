@@ -21,7 +21,7 @@ async def lend_asset(agent: SolanaAgentKit, amount: float) -> str:
     try:
         url = f"https://blink.lulo.fi/actions?amount={amount}&symbol=USDC"
         headers = {"Content-Type": "application/json"}
-        payload = json.dumps({"account": str(agent.wallet.public_key)})
+        payload = json.dumps({"account": str(agent.wallet.pubkey())})
 
         async with agent.session.post(url, headers=headers, data=payload) as response:
             if response.status != 200:
