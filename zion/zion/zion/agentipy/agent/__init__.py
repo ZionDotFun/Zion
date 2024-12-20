@@ -26,41 +26,49 @@ class SolanaAgentKit:
         self.openai_api_key = openai_api_key
 
     async def request_faucet_funds(self):
-        from agentipy.tools import request_faucet_funds
-        return await request_faucet_funds(self)
+        from agentipy.tools.request_faucet_funds import FaucetManager
+        return await FaucetManager.request_faucet_funds(self)
 
     async def deploy_token(self, decimals: int = DEFAULT_OPTIONS["TOKEN_DECIMALS"]):
-        from agentipy.tools import deploy_token
-        return await deploy_token(self, decimals)
+        from agentipy.tools.deploy_token import TokenDeploymentManager
+        return await TokenDeploymentManager.deploy_token(self, decimals)
 
     async def get_balance(self, token_address: Pubkey = None):
-        from agentipy.tools import get_balance
-        return await get_balance(self, token_address)
+        from agentipy.tools.get_balance import BalanceFetcher
+        return await BalanceFetcher.get_balance(self, token_address)
     
     async def fetch_price( token_id: str):
-        from agentipy.tools import fetch_price
-        return await fetch_price(token_id)
+        from agentipy.tools.fetch_price import TokenPriceFetcher
+        return await TokenPriceFetcher.fetch_price(token_id)
 
     async def transfer(self, to: Pubkey, amount: int, mint: Pubkey = None):
-        from agentipy.tools import transfer
-        return await transfer(self, to, amount, mint)
+        from agentipy.tools.transfer import TokenTransferManager
+        return await TokenTransferManager.execute_transfer(self, to, amount, mint)
 
     async def trade(self, output_mint: Pubkey, input_amount: int, input_mint: Pubkey = None, slippage_bps: int = DEFAULT_OPTIONS["SLIPPAGE_BPS"]):
-        from agentipy.tools import trade
-        return await trade(self, output_mint, input_amount, input_mint, slippage_bps)
+        from agentipy.tools.trade import TradeManager
+        return await TradeManager.trade(self, output_mint, input_amount, input_mint, slippage_bps)
 
     async def lend_assets(self, amount: int):
-        from agentipy.tools import lend
-        return await lend(self, amount)
+        from agentipy.tools.lend import AssetLender
+        return await AssetLender.lend(self, amount)
 
     async def get_tps(self):
-        from agentipy.tools import get_tps
-        return await get_tps(self)
+        from agentipy.tools.get_tps import SolanaPerformanceTracker
+        return await SolanaPerformanceTracker.fetch_current_tps(self)
+    
+    async def get_token_data_by_ticker(ticker:str):
+        from agentipy.tools.get_token_data import TokenDataManager
+        return await TokenDataManager.get_token_data_by_ticker(ticker)
+    
+    async def get_token_data_by_address(mint:str):
+        from agentipy.tools.get_token_data import TokenDataManager
+        return await TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
 
     async def launch_pump_fun_token(self, token_name: str, token_ticker: str, description: str, image_url: str, options: PumpfunTokenOptions = None):
-        from agentipy.tools import launch_pumpfun_token
-        return await launch_pumpfun_token(self, token_name, token_ticker, description, image_url, options)
+        from agentipy.tools.launch_pumpfun_token import PumpfunTokenManager
+        return await PumpfunTokenManager.launch_pumpfun_token(self, token_name, token_ticker, description, image_url, options)
 
     async def stake(self, amount: int):
-        from agentipy.tools import stake_with_jup
-        return await stake_with_jup(self, amount)
+        from agentipy.tools.stake_with_jup import StakeManager
+        return await StakeManager.stake_with_jup(self, amount)

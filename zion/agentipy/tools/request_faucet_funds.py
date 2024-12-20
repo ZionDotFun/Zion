@@ -4,12 +4,13 @@ from solana.rpc.core import RPCException
 from solana.rpc.types import TokenAccountOpts
 from solders.pubkey import Pubkey  # type: ignore
 
+from agentipy.agent import SolanaAgentKit
 from agentipy.constants import LAMPORTS_PER_SOL
 
 
 class FaucetManager:
     @staticmethod
-    async def request_faucet_funds(agent) -> str:
+    async def request_faucet_funds(agent: SolanaAgentKit) -> str:
         """
         Request SOL from the Solana faucet (devnet/testnet only).
 
@@ -23,17 +24,25 @@ class FaucetManager:
             Exception: If the request fails or times out.
         """
         try:
-            wallet_address = Pubkey.from_string(agent.wallet_address)
-            tx_signature = await agent.connection.request_airdrop(wallet_address, 5 * LAMPORTS_PER_SOL)
-            
+            print(f"Requesting faucet for wallet: {repr(agent.wallet_address)}")
+
+            response = await agent.connection.request_airdrop(
+                agent.wallet_address, 5 * LAMPORTS_PER_SOL
+            )
+
+            tx_signature = response["result"]
+
             latest_blockhash = await agent.connection.get_latest_blockhash()
             await agent.connection.confirm_transaction(
-                tx_signature, 
-                commitment=Confirmed, 
+                tx_signature,
+                commitment=Confirmed,
                 last_valid_block_height=latest_blockhash.value.last_valid_block_height
             )
 
+            print(f"Airdrop successful, transaction signature: {tx_signature}")
             return tx_signature
+        except KeyError:
+            raise Exception("Airdrop response did not contain a transaction signature.")
         except RPCException as e:
             raise Exception(f"Faucet request failed: {str(e)}")
         except Exception as e:

@@ -257,7 +257,6 @@ class SolanaCreateImageTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR")
             }
 
-
 class SolanaTPSCalculatorTool(BaseTool):
     name: str = "solana_get_tps"
     description: str = "Get the current TPS of the Solana network."
@@ -317,6 +316,96 @@ class SolanaPumpFunTokenTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+class SolanaFetchPriceTool(BaseTool):
+    """
+    Tool to fetch the price of a token in USDC.
+    """
+    name = "solana_fetch_price"
+    description = """Fetch the price of a given token in USDC.
+
+    Inputs:
+    - tokenId: string, the mint address of the token, e.g., "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
+    """
+
+    def __init__(self, solana_kit):
+        self.solana_kit = solana_kit
+
+    async def call(self, input: str) -> str:
+        try:
+            token_id = input.strip()
+            price = await self.solana_kit.fetch_price(token_id)
+            return json.dumps({
+                "status": "success",
+                "tokenId": token_id,
+                "priceInUSDC": price,
+            })
+        except Exception as error:
+            return json.dumps({
+                "status": "error",
+                "message": str(error),
+                "code": getattr(error, "code", "UNKNOWN_ERROR"),
+            })
+
+
+class SolanaTokenDataTool(BaseTool):
+    """
+    Tool to fetch token data for a given token mint address.
+    """
+    name = "solana_token_data"
+    description = """Get the token data for a given token mint address.
+
+    Inputs:
+    - mintAddress: string, e.g., "So11111111111111111111111111111111111111112" (required)
+    """
+
+    def __init__(self, solana_kit):
+        self.solana_kit = solana_kit
+
+    async def call(self, input: str) -> str:
+        try:
+            mint_address = input.strip()
+            token_data = await self.solana_kit.get_token_data_by_address(mint_address)
+            return json.dumps({
+                "status": "success",
+                "tokenData": token_data,
+            })
+        except Exception as error:
+            return json.dumps({
+                "status": "error",
+                "message": str(error),
+                "code": getattr(error, "code", "UNKNOWN_ERROR"),
+            })
+
+
+class SolanaTokenDataByTickerTool(BaseTool):
+    """
+    Tool to fetch token data for a given token ticker.
+    """
+    name = "solana_token_data_by_ticker"
+    description = """Get the token data for a given token ticker.
+
+    Inputs:
+    - ticker: string, e.g., "USDC" (required)
+    """
+
+    def __init__(self, solana_kit):
+        self.solana_kit = solana_kit
+
+    async def call(self, input: str) -> str:
+        try:
+            ticker = input.strip()
+            token_data = await self.solana_kit.get_token_data_by_ticker(ticker)
+            return json.dumps({
+                "status": "success",
+                "tokenData": token_data,
+            })
+        except Exception as error:
+            return json.dumps({
+                "status": "error",
+                "message": str(error),
+                "code": getattr(error, "code", "UNKNOWN_ERROR"),
+            })
+        
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit),
@@ -328,5 +417,8 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaPumpFunTokenTool(solana_kit),
         SolanaCreateImageTool(solana_kit),
         SolanaGetWalletAddressTool(solana_kit),
-        SolanaTPSCalculatorTool(solana_kit)
+        SolanaTPSCalculatorTool(solana_kit),
+        SolanaFetchPriceTool(solana_kit),
+        SolanaTokenDataTool(solana_kit),
+        SolanaTokenDataByTickerTool(solana_kit)
     ]

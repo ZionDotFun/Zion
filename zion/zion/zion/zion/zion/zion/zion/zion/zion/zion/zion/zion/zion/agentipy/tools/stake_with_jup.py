@@ -8,8 +8,6 @@ import aiohttp
 
 from agentipy.agent import SolanaAgentKit
 
-
-
 async def stake_with_jup(agent: SolanaAgentKit, amount: float) -> str:
     """
     Stake SOL with Jup validator.

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="agentipy",
-    version="1.1.4",
+    version="1.1.5",
     author="Utilify",
     author_email="hello@getutilify.com",
     description="A Python toolkit for Solana agents",

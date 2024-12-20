@@ -1,7 +1,10 @@
+import json
+
 from langchain.tools import BaseTool
 from solders.pubkey import Pubkey  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
+from agentipy.tools import create_image, fetch_price
 from agentipy.utils import toJSON
 
 
@@ -32,7 +35,6 @@ class SolanaBalanceTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
-
 
 class SolanaTransferTool(BaseTool):
     name:str = "solana_transfer"
@@ -107,7 +109,6 @@ class SolanaDeployTokenTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
-
 
 class SolanaTradeTool(BaseTool):
     name:str = "solana_trade"
@@ -194,6 +195,89 @@ class SolanaStakeTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+class SolanaGetWalletAddressTool(BaseTool):
+    name:str = "solana_get_wallet_address"
+    description:str = "Get the wallet address of the agent"
+
+    def __init__(self, solana_kit:SolanaAgentKit):
+        self.solana_kit = solana_kit
+    
+    async def _arun(self):
+        try:
+            result = await self.solana_kit.wallet_address
+            return {
+                "status": "success",
+                "message": "Wallet address fetched successfully",
+                "result": str(result),
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+
+class SolanaCreateImageTool(BaseTool):
+    name: str = "solana_create_image"
+    description: str = """
+    Create an image using OpenAI's DALL-E.
+
+    Input (JSON string):
+    {
+        "prompt": "description of the image",
+        "size": "image_size" (optional, default: "1024x1024"),
+        "n": "number_of_images" (optional, default: 1)
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            prompt = data["prompt"]
+            size = data.get("size", "1024x1024")
+            n = data.get("n", 1)
+
+            if not prompt.strip():
+                raise ValueError("Prompt must be a non-empty string.")
+
+            result = await create_image(self.solana_kit, prompt, size, n)
+
+            return {
+                "status": "success",
+                "message": "Image created successfully",
+                "images": result["images"]
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR")
+            }
+
+class SolanaTPSCalculatorTool(BaseTool):
+    name: str = "solana_get_tps"
+    description: str = "Get the current TPS of the Solana network."
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self):
+        try:
+            tps = await self.solana_kit.get_tps()
+
+            return {
+                "status": "success",
+                "message": f"Solana (mainnet-beta) current transactions per second: {tps}"
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error fetching TPS: {str(e)}",
+                "code": getattr(e, "code", "UNKNOWN_ERROR")
+            }
 class SolanaPumpFunTokenTool(BaseTool):
     nam:str = "solana_launch_pump_fun_token"
     description:str = """
@@ -232,6 +316,96 @@ class SolanaPumpFunTokenTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+class SolanaFetchPriceTool(BaseTool):
+    """
+    Tool to fetch the price of a token in USDC.
+    """
+    name = "solana_fetch_price"
+    description = """Fetch the price of a given token in USDC.
+
+    Inputs:
+    - tokenId: string, the mint address of the token, e.g., "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
+    """
+
+    def __init__(self, solana_kit):
+        self.solana_kit = solana_kit
+
+    async def call(self, input: str) -> str:
+        try:
+            token_id = input.strip()
+            price = await self.solana_kit.fetch_price(token_id)
+            return json.dumps({
+                "status": "success",
+                "tokenId": token_id,
+                "priceInUSDC": price,
+            })
+        except Exception as error:
+            return json.dumps({
+                "status": "error",
+                "message": str(error),
+                "code": getattr(error, "code", "UNKNOWN_ERROR"),
+            })
+
+
+class SolanaTokenDataTool(BaseTool):
+    """
+    Tool to fetch token data for a given token mint address.
+    """
+    name = "solana_token_data"
+    description = """Get the token data for a given token mint address.
+
+    Inputs:
+    - mintAddress: string, e.g., "So11111111111111111111111111111111111111112" (required)
+    """
+
+    def __init__(self, solana_kit):
+        self.solana_kit = solana_kit
+
+    async def call(self, input: str) -> str:
+        try:
+            mint_address = input.strip()
+            token_data = await self.solana_kit.get_token_data_by_address(mint_address)
+            return json.dumps({
+                "status": "success",
+                "tokenData": token_data,
+            })
+        except Exception as error:
+            return json.dumps({
+                "status": "error",
+                "message": str(error),
+                "code": getattr(error, "code", "UNKNOWN_ERROR"),
+            })
+
+
+class SolanaTokenDataByTickerTool(BaseTool):
+    """
+    Tool to fetch token data for a given token ticker.
+    """
+    name = "solana_token_data_by_ticker"
+    description = """Get the token data for a given token ticker.
+
+    Inputs:
+    - ticker: string, e.g., "USDC" (required)
+    """
+
+    def __init__(self, solana_kit):
+        self.solana_kit = solana_kit
+
+    async def call(self, input: str) -> str:
+        try:
+            ticker = input.strip()
+            token_data = await self.solana_kit.get_token_data_by_ticker(ticker)
+            return json.dumps({
+                "status": "success",
+                "tokenData": token_data,
+            })
+        except Exception as error:
+            return json.dumps({
+                "status": "error",
+                "message": str(error),
+                "code": getattr(error, "code", "UNKNOWN_ERROR"),
+            })
+        
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit),
@@ -240,5 +414,11 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaTradeTool(solana_kit),
         SolanaFaucetTool(solana_kit),
         SolanaStakeTool(solana_kit),
-        SolanaPumpFunTokenTool(solana_kit)
+        SolanaPumpFunTokenTool(solana_kit),
+        SolanaCreateImageTool(solana_kit),
+        SolanaGetWalletAddressTool(solana_kit),
+        SolanaTPSCalculatorTool(solana_kit),
+        SolanaFetchPriceTool(solana_kit),
+        SolanaTokenDataTool(solana_kit),
+        SolanaTokenDataByTickerTool(solana_kit)
     ]
