@@ -16,6 +16,7 @@ agentipy/tools/create_image.py
 agentipy/tools/deploy_token.py
 agentipy/tools/fetch_price.py
 agentipy/tools/get_balance.py
+agentipy/tools/get_token_data.py
 agentipy/tools/get_tps.py
 agentipy/tools/launch_pumpfun_token.py
 agentipy/tools/lend.py

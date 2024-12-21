@@ -1,18 +1,16 @@
-from typing import Any, Dict, Optional
-import aiohttp
 import logging
+from typing import Any, Dict, Optional
 
-from solders.keypair import Keypair
-from solders.transaction import VersionedTransaction
-from solana.rpc.commitment import Confirmed
+import aiohttp
 from solana.rpc.async_api import AsyncClient
+from solana.rpc.commitment import Confirmed
+from solders.keypair import Keypair  # type: ignore
+from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
 from agentipy.constants import DEFAULT_OPTIONS
 from agentipy.types import PumpFunTokenOptions, TokenLaunchResult
 from agentipy.utils.send_tx import sign_and_send_transaction
-
-
 
 logger = logging.getLogger(__name__)
 

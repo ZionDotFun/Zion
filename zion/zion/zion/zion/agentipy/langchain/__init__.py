@@ -320,8 +320,8 @@ class SolanaFetchPriceTool(BaseTool):
     """
     Tool to fetch the price of a token in USDC.
     """
-    name = "solana_fetch_price"
-    description = """Fetch the price of a given token in USDC.
+    name:str = "solana_fetch_price"
+    description:str = """Fetch the price of a given token in USDC.
 
     Inputs:
     - tokenId: string, the mint address of the token, e.g., "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
@@ -351,8 +351,8 @@ class SolanaTokenDataTool(BaseTool):
     """
     Tool to fetch token data for a given token mint address.
     """
-    name = "solana_token_data"
-    description = """Get the token data for a given token mint address.
+    name:str = "solana_token_data"
+    description:str = """Get the token data for a given token mint address.
 
     Inputs:
     - mintAddress: string, e.g., "So11111111111111111111111111111111111111112" (required)
@@ -381,8 +381,8 @@ class SolanaTokenDataByTickerTool(BaseTool):
     """
     Tool to fetch token data for a given token ticker.
     """
-    name = "solana_token_data_by_ticker"
-    description = """Get the token data for a given token ticker.
+    name:str = "solana_token_data_by_ticker"
+    description:str = """Get the token data for a given token ticker.
 
     Inputs:
     - ticker: string, e.g., "USDC" (required)
