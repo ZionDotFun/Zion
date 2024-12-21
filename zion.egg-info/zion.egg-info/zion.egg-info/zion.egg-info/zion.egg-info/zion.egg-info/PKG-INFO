@@ -1,0 +1,33 @@
+Metadata-Version: 2.1
+Name: agentipy
+Version: 1.1.4
+Summary: A Python toolkit for Solana agents
+Home-page: https://github.com/niceberginc/agentipy
+Author: Utilify
+Author-email: hello@getutilify.com
+Project-URL: Bug Tracker, https://github.com/niceberginc/agentipy/issues
+Project-URL: Documentation, https://github.com/niceberginc/agentipy#readme
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE.md
+Requires-Dist: requests==2.32.3
+Requires-Dist: python-dotenv==1.0.1
+Requires-Dist: numpy<2,==1.22.4
+Requires-Dist: base58>=2.1.1
+Requires-Dist: aiohttp>=3.11.10
+Requires-Dist: pillow>=11.0.0
+Requires-Dist: openai>=1.58.1
+Requires-Dist: solana>=0.36.1
+Requires-Dist: solders>=0.23.0
+Requires-Dist: pydantic>=2.10.4
+Requires-Dist: langchain>=0.3.12
+Provides-Extra: dev
+Requires-Dist: pytest==8.3.4; extra == "dev"
+Requires-Dist: black==24.10.0; extra == "dev"
+Requires-Dist: isort>=5.10.0; extra == "dev"
+
+# agentipy
+Agentipy. coming soon.
