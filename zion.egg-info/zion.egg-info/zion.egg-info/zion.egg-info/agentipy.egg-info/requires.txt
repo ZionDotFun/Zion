@@ -1,0 +1,16 @@
+requests==2.32.3
+python-dotenv==1.0.1
+numpy<2,==1.22.4
+base58>=2.1.1
+aiohttp>=3.11.10
+pillow>=11.0.0
+openai>=1.58.1
+solana>=0.36.1
+solders>=0.23.0
+pydantic>=2.10.4
+langchain>=0.3.12
+
+[dev]
+pytest==8.3.4
+black==24.10.0
+isort>=5.10.0
