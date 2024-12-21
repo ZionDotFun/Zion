@@ -1,20 +1,16 @@
+import logging
+from typing import Any, Dict
+
 from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Confirmed
-from solders.transaction import Transaction
+from solders.keypair import Keypair  # type: ignore
+from solders.pubkey import Pubkey  # type: ignore
 from solders.system_program import CreateAccountParams, create_account
-from solana.keypair import Keypair
-from spl.token.instructions import initialize_mint2, MINT_SIZE
-from spl.token.constants import TOKEN_PROGRAM_ID
-from solana.publickey import PublicKey
-from solana.rpc.types import TokenAccountOpts
-from typing import Dict, Any
-
+from solders.transaction import Transaction  # type: ignore
+from spl.token.constants import MINT_LEN, TOKEN_PROGRAM_ID
+from spl.token.instructions import initialize_mint
 
 from agentipy.agent import SolanaAgentKit
-
-
-import asyncio
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +25,7 @@ async def get_minimum_balance_for_rent_exemption(connection: AsyncClient) -> int
     Returns:
         Minimum balance in lamports required for rent exemption.
     """
-    lamports = await connection.get_minimum_balance_for_rent_exemption(MINT_SIZE)
+    lamports = await connection.get_minimum_balance_for_rent_exemption(MINT_LEN)
     return lamports
 
 
@@ -58,17 +54,17 @@ async def deploy_token(agent:SolanaAgentKit, decimals: int = 9) -> Dict[str, Any
                 from_pubkey=agent.wallet_address,
                 to_pubkey=mint.public_key,
                 lamports=lamports,
-                space=MINT_SIZE,
+                space=MINT_LEN,
                 program_id=TOKEN_PROGRAM_ID,
             )
         )
 
-        initialize_mint_ix = initialize_mint2(
+        initialize_mint_ix = initialize_mint(
             program_id=TOKEN_PROGRAM_ID,
             mint=mint.public_key,
             decimals=decimals,
-            mint_authority=PublicKey(agent.wallet_address),
-            freeze_authority=PublicKey(agent.wallet_address),
+            mint_authority=Pubkey.from_string(agent.wallet_address),
+            freeze_authority=Pubkey.from_string(agent.wallet_address),
         )
 
         transaction = Transaction()

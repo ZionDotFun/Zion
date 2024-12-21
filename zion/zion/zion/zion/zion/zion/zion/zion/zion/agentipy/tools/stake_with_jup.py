@@ -1,12 +1,13 @@
 import base64
-from solders.transaction import VersionedTransaction
+
+import aiohttp
 from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Confirmed
-from solders.pubkey import Pubkey
-from solders.keypair import Keypair
-import aiohttp
+from solders.keypair import Keypair  # type: ignore
+from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
+
 
 async def stake_with_jup(agent: SolanaAgentKit, amount: float) -> str:
     """
