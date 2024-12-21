@@ -1,8 +1,8 @@
 import base64
 import json
 
-from solders.transaction import VersionedTransaction
 from solana.rpc.commitment import Confirmed
+from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
 

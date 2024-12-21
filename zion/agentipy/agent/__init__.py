@@ -62,11 +62,11 @@ class SolanaAgentKit:
     
     async def get_token_data_by_ticker(self, ticker:str):
         from agentipy.tools.get_token_data import TokenDataManager
-        return await TokenDataManager.get_token_data_by_ticker(ticker)
+        return TokenDataManager.get_token_data_by_ticker(ticker)
     
     async def get_token_data_by_address(self, mint:str):
         from agentipy.tools.get_token_data import TokenDataManager
-        return await TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
+        return TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
 
     async def launch_pump_fun_token(self, token_name: str, token_ticker: str, description: str, image_url: str, options: PumpfunTokenOptions = None):
         from agentipy.tools.launch_pumpfun_token import PumpfunTokenManager

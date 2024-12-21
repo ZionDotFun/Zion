@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="agentipy",
-    version="1.1.5",
+    version="1.2.2",
     author="Utilify",
     author_email="hello@getutilify.com",
     description="A Python toolkit for Solana agents",
@@ -22,11 +22,11 @@ setup(
         "aiohttp>=3.11.10",
         "pillow>=11.0.0",
         "openai>=1.58.1",
-        "solana>=0.36.1",
-        "solders>=0.23.0",
+        "solana>=0.35.0",
+        "solders>=0.21.0,<0.24.0",
         "pydantic>=2.10.4",
         "langchain>=0.3.12",
-
+        "anchorpy>=0.20.1"
     ],
     extras_require={
         "dev": [
