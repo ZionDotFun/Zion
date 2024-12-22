@@ -6,6 +6,7 @@ from solders.pubkey import Pubkey  # type: ignore
 from agentipy.agent import SolanaAgentKit
 from agentipy.tools import create_image, fetch_price
 from agentipy.utils import toJSON
+from agentipy.utils.meteora_dlmm.types import ActivationType
 
 
 class SolanaBalanceTool(BaseTool):
@@ -279,7 +280,7 @@ class SolanaTPSCalculatorTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR")
             }
 class SolanaPumpFunTokenTool(BaseTool):
-    nam:str = "solana_launch_pump_fun_token"
+    name:str = "solana_launch_pump_fun_token"
     description:str = """
     Launch a Pump Fun token on Solana.
 
@@ -303,6 +304,7 @@ class SolanaPumpFunTokenTool(BaseTool):
                 data["token_ticker"],
                 data["description"],
                 data["image_url"],
+                options=data.get("options")
             )
             return {
                 "status": "success",
@@ -346,7 +348,6 @@ class SolanaFetchPriceTool(BaseTool):
                 "code": getattr(error, "code", "UNKNOWN_ERROR"),
             })
 
-
 class SolanaTokenDataTool(BaseTool):
     """
     Tool to fetch token data for a given token mint address.
@@ -376,7 +377,6 @@ class SolanaTokenDataTool(BaseTool):
                 "code": getattr(error, "code", "UNKNOWN_ERROR"),
             })
 
-
 class SolanaTokenDataByTickerTool(BaseTool):
     """
     Tool to fetch token data for a given token ticker.
@@ -405,7 +405,88 @@ class SolanaTokenDataByTickerTool(BaseTool):
                 "message": str(error),
                 "code": getattr(error, "code", "UNKNOWN_ERROR"),
             })
-        
+
+class SolanaMeteoraDLMMTool(BaseTool):
+    """
+    Tool to create dlmm pool on meteora.
+    """
+    name: str = "solana_create_meteora_dlmm_pool"
+    description: str = """
+    Create a Meteora DLMM Pool on Solana.
+
+    Input (JSON string):
+    {
+        "bin_step": 5,
+        "token_a_mint": "7S3d7xxFPgFhVde8XwDoQG9N7kF8Vo48ghAhoNxd34Zp",
+        "token_b_mint": "A1b1xxFPgFhVde8XwDoQG9N7kF8Vo48ghAhoNxd34Zp",
+        "initial_price": 1.23,
+        "price_rounding_up": true,
+        "fee_bps": 300,
+        "activation_type": "Instant",  // Options: "Instant", "Delayed", "Manual"
+        "has_alpha_vault": false,
+        "activation_point": null      // Optional, only for Delayed type
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str) -> dict:
+        try:
+            # Parse input
+            data = toJSON(input)
+
+            # Ensure required keys exist
+            required_keys = [
+                "bin_step",
+                "token_a_mint",
+                "token_b_mint",
+                "initial_price",
+                "price_rounding_up",
+                "fee_bps",
+                "activation_type",
+                "has_alpha_vault"
+            ]
+            for key in required_keys:
+                if key not in data:
+                    raise ValueError(f"Missing required key: {key}")
+
+            activation_type_mapping = {
+                "Slot": ActivationType.Slot,
+                "Timestamp": ActivationType.Timestamp,
+            }
+            activation_type = activation_type_mapping.get(data["activation_type"])
+            if activation_type is None:
+                raise ValueError("Invalid activation_type. Valid options are: Slot, Timestamp.")
+
+            activation_point = data.get("activation_point", None)
+
+            result = await self.solana_kit.create_meteora_dlmm_pool(
+                bin_step=data["bin_step"],
+                token_a_mint=data["token_a_mint"],
+                token_b_mint=data["token_b_mint"],
+                initial_price=data["initial_price"],
+                price_rounding_up=data["price_rounding_up"],
+                fee_bps=data["fee_bps"],
+                activation_type=activation_type,
+                has_alpha_vault=data["has_alpha_vault"],
+                activation_point=activation_point
+            )
+
+            return {
+                "status": "success",
+                "message": "Meteora DLMM pool created successfully",
+                "result": result,
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Failed to process input: {input}. Error: {str(e)}",
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit),
@@ -420,5 +501,6 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaTPSCalculatorTool(solana_kit),
         SolanaFetchPriceTool(solana_kit),
         SolanaTokenDataTool(solana_kit),
-        SolanaTokenDataByTickerTool(solana_kit)
+        SolanaTokenDataByTickerTool(solana_kit),
+        SolanaMeteoraDLMMTool(solana_kit),
     ]

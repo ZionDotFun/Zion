@@ -1,7 +1,8 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from agentipy.agent import SolanaAgentKit
-from agentipy.types import NetworkPerformanceMetrics 
+from agentipy.types import NetworkPerformanceMetrics
+
 
 async def fetch_current_tps(agent: SolanaAgentKit) -> float:
     """
@@ -17,19 +18,29 @@ async def fetch_current_tps(agent: SolanaAgentKit) -> float:
         ValueError: If performance samples are unavailable or invalid.
     """
     try:
-        performance_samples = await agent.connection.get_recent_performance_samples(1)
+        # Fetch recent performance samples
+        response = await agent.connection.get_recent_performance_samples(1)
 
+        # Extract the list of samples
+        performance_samples = response.value
+        print("Performance Samples:", performance_samples)
+
+        # Check if any samples are available
         if not performance_samples:
             raise ValueError("No performance samples available.")
 
+        # Use the first sample
         sample = performance_samples[0]
 
+        # Validate the sample data
         if not all(
-            key in sample for key in ["num_transactions", "sample_period_secs"]
-        ) or sample["num_transactions"] <= 0 or sample["sample_period_secs"] <= 0:
+            hasattr(sample, attr)
+            for attr in ["num_transactions", "sample_period_secs"]
+        ) or sample.num_transactions <= 0 or sample.sample_period_secs <= 0:
             raise ValueError("Invalid performance sample data.")
 
-        return sample["num_transactions"] / sample["sample_period_secs"]
+        # Calculate TPS
+        return sample.num_transactions / sample.sample_period_secs
 
     except Exception as error:
         raise ValueError(f"Failed to fetch TPS: {str(error)}") from error
