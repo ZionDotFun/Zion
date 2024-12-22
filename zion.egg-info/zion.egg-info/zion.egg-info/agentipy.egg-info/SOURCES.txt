@@ -13,6 +13,7 @@ agentipy/constants/__init__.py
 agentipy/langchain/__init__.py
 agentipy/tools/__init__.py
 agentipy/tools/create_image.py
+agentipy/tools/create_meteora_dlmm_pool.py
 agentipy/tools/deploy_token.py
 agentipy/tools/fetch_price.py
 agentipy/tools/get_balance.py
@@ -29,4 +30,10 @@ agentipy/utils/__init__.py
 agentipy/utils/keypair.py
 agentipy/utils/send_tx.py
 agentipy/utils/toJSON.py
+agentipy/utils/meteora_dlmm/__init__.py
+agentipy/utils/meteora_dlmm/constants.py
+agentipy/utils/meteora_dlmm/helpers.py
+agentipy/utils/meteora_dlmm/idl.py
+agentipy/utils/meteora_dlmm/types.py
+agentipy/utils/meteora_dlmm/utils.py
 tests/__init__.py

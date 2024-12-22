@@ -9,7 +9,7 @@ from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
 from agentipy.constants import DEFAULT_OPTIONS
-from agentipy.types import PumpFunTokenOptions, TokenLaunchResult
+from agentipy.types import PumpfunTokenOptions, TokenLaunchResult
 from agentipy.utils.send_tx import sign_and_send_transaction
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ class PumpfunTokenManager:
     token_ticker: str,
     description: str,
     image_url: str,
-    options: Optional[PumpFunTokenOptions] = None
+    options: Optional[PumpfunTokenOptions] = None
 ) -> Dict[str, Any]:
         """
         Upload token metadata and image to IPFS via Pump.fun.
@@ -77,7 +77,7 @@ class PumpfunTokenManager:
         agent: SolanaAgentKit,
         mint_keypair: Keypair,
         metadata_response: Dict[str, Any],
-        options: Optional[PumpFunTokenOptions] = None
+        options: Optional[PumpfunTokenOptions] = None
     ) -> bytes:
         """
         Create token transaction through Pump.fun API.
@@ -91,7 +91,7 @@ class PumpfunTokenManager:
         Returns:
             Serialized transaction bytes
         """
-        options = options or PumpFunTokenOptions()
+        options = options or PumpfunTokenOptions()
         
         payload = {
             "publicKey": str(agent.wallet_address),
@@ -127,7 +127,7 @@ class PumpfunTokenManager:
         token_ticker: str,
         description: str,
         image_url: str,
-        options: Optional[PumpFunTokenOptions] = None
+        options: Optional[PumpfunTokenOptions] = None
     ) -> TokenLaunchResult:
         """
         Launch a new token on Pump.fun.
