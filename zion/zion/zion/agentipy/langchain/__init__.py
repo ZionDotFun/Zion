@@ -566,6 +566,79 @@ class SolanaRaydiumSellTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+class SolanaBurnAndCloseTool(BaseTool):
+    name: str = "solana_burn_and_close_account"
+    description: str = """
+    Burn and close a single Solana token account.
+
+    Input: A JSON string with:
+    {
+        "token_account": "public_key_of_the_token_account"
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = toJSON(input)
+            token_account = data["token_account"]
+
+            if not token_account:
+                raise ValueError("Token account is required.")
+
+            result = await self.solana_kit.burn_and_close_accounts(token_account)
+
+            return {
+                "status": "success",
+                "message": "Token account burned and closed successfully.",
+                "result": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+
+class SolanaBurnAndCloseMultipleTool(BaseTool):
+    name: str = "solana_burn_and_close_multiple_accounts"
+    description: str = """
+    Burn and close multiple Solana token accounts.
+
+    Input: A JSON string with:
+    {
+        "token_accounts": ["public_key_1", "public_key_2", ...]
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = toJSON(input)
+            token_accounts = data.get("token_accounts", [])
+
+            if not isinstance(token_accounts, list) or not token_accounts:
+                raise ValueError("A list of token accounts is required.")
+
+            result = await self.solana_kit.multiple_burn_and_close_accounts(token_accounts)
+
+            return {
+                "status": "success",
+                "message": "Token accounts burned and closed successfully.",
+                "result": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit),
