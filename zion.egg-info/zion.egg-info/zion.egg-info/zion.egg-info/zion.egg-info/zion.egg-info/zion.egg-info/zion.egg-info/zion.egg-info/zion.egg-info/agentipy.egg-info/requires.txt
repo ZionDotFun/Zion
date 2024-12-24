@@ -5,11 +5,10 @@ base58>=2.1.1
 aiohttp>=3.11.10
 pillow>=11.0.0
 openai>=1.58.1
-solana>=0.35.0
-solders<0.24.0,>=0.21.0
+solana>=0.36.1
+solders>=0.23.0
 pydantic>=2.10.4
 langchain>=0.3.12
-anchorpy>=0.20.1
 
 [dev]
 pytest==8.3.4
