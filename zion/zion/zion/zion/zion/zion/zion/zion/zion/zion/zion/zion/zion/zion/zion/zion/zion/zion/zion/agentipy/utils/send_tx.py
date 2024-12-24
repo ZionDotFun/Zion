@@ -1,14 +1,15 @@
 import json
-import requests
 import logging
 
-from solana.rpc.commitment import Confirmed
+import requests
 from solana.rpc.async_api import AsyncClient
-from solders.keypair import Keypair
-from solders.transaction import Transaction, VersionedTransaction
-from solders.pubkey import Pubkey
-from solders.instruction import Instruction
-from solders.compute_budget import set_compute_unit_price
+from solana.rpc.commitment import Confirmed
+from solders.compute_budget import set_compute_unit_price  # type: ignore
+from solders.instruction import Instruction  # type: ignore
+from solders.keypair import Keypair  # type: ignore
+from solders.pubkey import Pubkey  # type: ignore
+from solders.transaction import (Transaction,  # type: ignore
+                                 VersionedTransaction)
 
 from agentipy.agent import SolanaAgentKit
 

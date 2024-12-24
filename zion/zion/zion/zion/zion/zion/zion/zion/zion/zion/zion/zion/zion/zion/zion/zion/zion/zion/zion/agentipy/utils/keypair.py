@@ -1,6 +1,6 @@
-from solders.keypair import Keypair
-from solders.pubkey import Pubkey
 import base58
+from solders.keypair import Keypair  # type: ignore
+from solders.pubkey import Pubkey  # type: ignore
 
 keypair = Keypair()
 

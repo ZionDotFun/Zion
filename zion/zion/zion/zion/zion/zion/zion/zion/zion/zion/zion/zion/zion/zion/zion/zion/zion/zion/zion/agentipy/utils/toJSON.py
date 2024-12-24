@@ -1,5 +1,6 @@
 import json
 
+
 def to_json(s:str) -> dict:
     """
     Convert a string in the format `{key1:value1,key2:value2}` to a Python dictionary.
