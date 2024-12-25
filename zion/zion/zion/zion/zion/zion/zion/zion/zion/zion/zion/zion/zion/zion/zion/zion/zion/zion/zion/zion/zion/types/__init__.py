@@ -77,8 +77,3 @@ class TransferResult(BaseModelWithArbitraryTypes):
     to_address: str
     amount: float
     token: Optional[str] = None
-
-class JupiterTokenData(BaseModelWithArbitraryTypes):
-    address:str
-    symbol:str
-    name:str

@@ -1,5 +1,3 @@
-from typing import Optional
-
 import base58
 from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair  # type: ignore
@@ -7,7 +5,6 @@ from solders.pubkey import Pubkey  # type: ignore
 
 from agentipy.constants import DEFAULT_OPTIONS
 from agentipy.types import PumpfunTokenOptions
-from agentipy.utils.meteora_dlmm.types import ActivationType
 
 
 class SolanaAgentKit:
@@ -18,7 +15,7 @@ class SolanaAgentKit:
     Attributes:
         connection (AsyncClient): Solana RPC connection.
         wallet (Keypair): Wallet keypair for signing transactions.
-        wallet_address (Pubkey): Public key of the wallet.
+        wallet_address (PublicKey): Public key of the wallet.
         openai_api_key (str): OpenAI API key for additional functionality.
     """
 
@@ -40,7 +37,7 @@ class SolanaAgentKit:
         from agentipy.tools.get_balance import BalanceFetcher
         return await BalanceFetcher.get_balance(self, token_address)
     
-    async def fetch_price(self, token_id: str):
+    async def fetch_price( token_id: str):
         from agentipy.tools.fetch_price import TokenPriceFetcher
         return await TokenPriceFetcher.fetch_price(token_id)
 
@@ -60,13 +57,13 @@ class SolanaAgentKit:
         from agentipy.tools.get_tps import SolanaPerformanceTracker
         return await SolanaPerformanceTracker.fetch_current_tps(self)
     
-    async def get_token_data_by_ticker(self, ticker:str):
+    async def get_token_data_by_ticker(ticker:str):
         from agentipy.tools.get_token_data import TokenDataManager
-        return TokenDataManager.get_token_data_by_ticker(ticker)
+        return await TokenDataManager.get_token_data_by_ticker(ticker)
     
-    async def get_token_data_by_address(self, mint:str):
+    async def get_token_data_by_address(mint:str):
         from agentipy.tools.get_token_data import TokenDataManager
-        return TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
+        return await TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
 
     async def launch_pump_fun_token(self, token_name: str, token_ticker: str, description: str, image_url: str, options: PumpfunTokenOptions = None):
         from agentipy.tools.launch_pumpfun_token import PumpfunTokenManager
@@ -75,7 +72,3 @@ class SolanaAgentKit:
     async def stake(self, amount: int):
         from agentipy.tools.stake_with_jup import StakeManager
         return await StakeManager.stake_with_jup(self, amount)
-    
-    async def create_meteora_dlmm_pool(self, bin_step:int, token_a_mint: Pubkey,token_b_mint: Pubkey,initial_price: float,price_rounding_up: bool,fee_bps: int,activation_type: ActivationType,has_alpha_vault: bool,activation_point: Optional[int]):
-        from agentipy.tools.create_meteora_dlmm_pool import MeteoraManager
-        return await MeteoraManager.create_meteora_dlmm_pool(self,bin_step,token_a_mint,token_b_mint,initial_price,price_rounding_up,fee_bps,activation_type,has_alpha_vault,activation_point)
