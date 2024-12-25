@@ -37,7 +37,7 @@ class SolanaAgentKit:
         from agentipy.tools.get_balance import BalanceFetcher
         return await BalanceFetcher.get_balance(self, token_address)
     
-    async def fetch_price( token_id: str):
+    async def fetch_price(self, token_id: str):
         from agentipy.tools.fetch_price import TokenPriceFetcher
         return await TokenPriceFetcher.fetch_price(token_id)
 
@@ -57,11 +57,11 @@ class SolanaAgentKit:
         from agentipy.tools.get_tps import SolanaPerformanceTracker
         return await SolanaPerformanceTracker.fetch_current_tps(self)
     
-    async def get_token_data_by_ticker(ticker:str):
+    async def get_token_data_by_ticker(self, ticker:str):
         from agentipy.tools.get_token_data import TokenDataManager
         return await TokenDataManager.get_token_data_by_ticker(ticker)
     
-    async def get_token_data_by_address(mint:str):
+    async def get_token_data_by_address(self, mint:str):
         from agentipy.tools.get_token_data import TokenDataManager
         return await TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
 
