@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentipy"
-version = "1.2.6"
+version = "1.2.8"
 description = "A Python toolkit for Solana agents"
 authors = ["Muhammed Talha Korkmaz <kriptovekediler@gmail.com>"]
 license = "MIT"
@@ -25,12 +25,13 @@ setuptools = "^75.6.0"
 langchain = "^0.3.12"
 wheel = "^0.45.1"
 twine = "^6.0.1"
-numpy = "1.22.4,<2"
+numpy = "^1.26.2,<3"
 python-dotenv = "^1.0.1"
 aiohttp = "^3.11.11"
 solders = "^0.21.0,<0.24.0"
 solana = "^0.35.0"
 anchorpy = "^0.20.1"
+pythclient = "^0.2.0"
 
 [build-system]
 requires = ["poetry-core"]
