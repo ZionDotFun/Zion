@@ -637,7 +637,49 @@ class SolanaBurnAndCloseMultipleTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+class SolanaCreateGibworkTaskTool(BaseTool):
+    name: str = "solana_create_gibwork_task"
+    description: str = """
+    Create an new task on Gibwork
 
+    Input: A JSON string with:
+    {
+        "title": "title of the task",
+        "content: "description of the task",
+        "requirements": "requirements to complete the task",
+        "tags": ["tag1", "tag2", ...] # list of tags associated with the task,
+        "token_mint_address": "token mint address for payment",
+        "token_amount": 1000 # amount of token to pay for the task
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = toJSON(input)
+            title = data["title"]
+            content = data["content"]
+            requirements = data["requirements"]
+            tags = data.get("tags", [])
+            token_mint_address = Pubkey.from_string(data["token_mint_address"])
+            token_amount = data["token_amount"]
+            
+            result = await self.solana_kit.create_gibwork_task(title, content, requirements, tags, token_mint_address, token_amount)
+
+            return {
+                "status": "success",
+                "message": "Token accounts burned and closed successfully.",
+                "result": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
 
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
@@ -657,4 +699,5 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaMeteoraDLMMTool(solana_kit),
         SolanaRaydiumBuyTool(solana_kit),
         SolanaRaydiumSellTool(solana_kit),
+        SolanaCreateGibworkTaskTool(solana_kit),
     ]
