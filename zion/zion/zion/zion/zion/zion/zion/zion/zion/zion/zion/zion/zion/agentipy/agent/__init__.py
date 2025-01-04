@@ -83,9 +83,16 @@ class SolanaAgentKit:
     
     async def buy_with_raydium(self, pair_address: str, sol_in: float = .01, slippage: int = 5):
         from agentipy.tools.use_raydium import RaydiumManager
-        return await RaydiumManager.buy_with_raydium(self, pair_address, sol_in, slippage)
+        return RaydiumManager.buy_with_raydium(self, pair_address, sol_in, slippage)
     
     async def sell_with_raydium(self, pair_address: str,percentage: int = 100, slippage: int = 5):
         from agentipy.tools.use_raydium import RaydiumManager
-        return await RaydiumManager.sell_with_raydium(self, pair_address, percentage, slippage)
-        
+        return RaydiumManager.sell_with_raydium(self, pair_address, percentage, slippage)
+    
+    async def burn_and_close_accounts(self, token_account:str):
+        from agentipy.tools.burn_and_close_account import BurnManager
+        return BurnManager.burn_and_close_account(self, token_account)
+    
+    async def multiple_burn_and_close_accounts(self, token_accounts):
+        from agentipy.tools.burn_and_close_account import BurnManager
+        return BurnManager.process_multiple_accounts(self, token_accounts)

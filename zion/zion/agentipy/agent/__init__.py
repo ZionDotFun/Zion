@@ -37,7 +37,7 @@ class SolanaAgentKit:
         from agentipy.tools.deploy_token import TokenDeploymentManager
         return await TokenDeploymentManager.deploy_token(self, decimals)
 
-    async def get_balance(self, token_address: Pubkey = None):
+    async def get_balance(self, token_address: Optional[Pubkey] = None):
         from agentipy.tools.get_balance import BalanceFetcher
         return await BalanceFetcher.get_balance(self, token_address)
     
@@ -45,11 +45,11 @@ class SolanaAgentKit:
         from agentipy.tools.fetch_price import TokenPriceFetcher
         return await TokenPriceFetcher.fetch_price(token_id)
 
-    async def transfer(self, to: Pubkey, amount: int, mint: Pubkey = None):
+    async def transfer(self, to: Pubkey, amount: int, mint: Optional[Pubkey] = None):
         from agentipy.tools.transfer import TokenTransferManager
         return await TokenTransferManager.execute_transfer(self, to, amount, mint)
 
-    async def trade(self, output_mint: Pubkey, input_amount: int, input_mint: Pubkey = None, slippage_bps: int = DEFAULT_OPTIONS["SLIPPAGE_BPS"]):
+    async def trade(self, output_mint: Pubkey, input_amount: int, input_mint: Optional[Pubkey] = None, slippage_bps: int = DEFAULT_OPTIONS["SLIPPAGE_BPS"]):
         from agentipy.tools.trade import TradeManager
         return await TradeManager.trade(self, output_mint, input_amount, input_mint, slippage_bps)
 
@@ -61,15 +61,15 @@ class SolanaAgentKit:
         from agentipy.tools.get_tps import SolanaPerformanceTracker
         return await SolanaPerformanceTracker.fetch_current_tps(self)
     
-    async def get_token_data_by_ticker(self, ticker:str):
+    async def get_token_data_by_ticker(self, ticker: str):
         from agentipy.tools.get_token_data import TokenDataManager
         return TokenDataManager.get_token_data_by_ticker(ticker)
     
-    async def get_token_data_by_address(self, mint:str):
+    async def get_token_data_by_address(self, mint: str):
         from agentipy.tools.get_token_data import TokenDataManager
         return TokenDataManager.get_token_data_by_address(Pubkey.from_string(mint))
 
-    async def launch_pump_fun_token(self, token_name: str, token_ticker: str, description: str, image_url: str, options: PumpfunTokenOptions = None):
+    async def launch_pump_fun_token(self, token_name: str, token_ticker: str, description: str, image_url: str, options: Optional[PumpfunTokenOptions] = None):
         from agentipy.tools.launch_pumpfun_token import PumpfunTokenManager
         return await PumpfunTokenManager.launch_pumpfun_token(self, token_name, token_ticker, description, image_url, options)
 
@@ -77,37 +77,37 @@ class SolanaAgentKit:
         from agentipy.tools.stake_with_jup import StakeManager
         return await StakeManager.stake_with_jup(self, amount)
     
-    async def create_meteora_dlmm_pool(self, bin_step:int, token_a_mint: Pubkey,token_b_mint: Pubkey,initial_price: float,price_rounding_up: bool,fee_bps: int,activation_type: ActivationType,has_alpha_vault: bool,activation_point: Optional[int]):
+    async def create_meteora_dlmm_pool(self, bin_step: int, token_a_mint: Pubkey, token_b_mint: Pubkey, initial_price: float, price_rounding_up: bool, fee_bps: int, activation_type: ActivationType, has_alpha_vault: bool, activation_point: Optional[int]):
         from agentipy.tools.create_meteora_dlmm_pool import MeteoraManager
-        return await MeteoraManager.create_meteora_dlmm_pool(self,bin_step,token_a_mint,token_b_mint,initial_price,price_rounding_up,fee_bps,activation_type,has_alpha_vault,activation_point)
+        return await MeteoraManager.create_meteora_dlmm_pool(self, bin_step, token_a_mint, token_b_mint, initial_price, price_rounding_up, fee_bps, activation_type, has_alpha_vault, activation_point)
     
-    async def buy_with_raydium(self, pair_address: str, sol_in: float = .01, slippage: int = 5):
+    async def buy_with_raydium(self, pair_address: str, sol_in: float = 0.01, slippage: int = 5):
         from agentipy.tools.use_raydium import RaydiumManager
-        return RaydiumManager.buy_with_raydium(self, pair_address, sol_in, slippage)
+        return await RaydiumManager.buy_with_raydium(self, pair_address, sol_in, slippage)
     
-    async def sell_with_raydium(self, pair_address: str,percentage: int = 100, slippage: int = 5):
+    async def sell_with_raydium(self, pair_address: str, percentage: int = 100, slippage: int = 5):
         from agentipy.tools.use_raydium import RaydiumManager
-        return RaydiumManager.sell_with_raydium(self, pair_address, percentage, slippage)
+        return await RaydiumManager.sell_with_raydium(self, pair_address, percentage, slippage)
     
-    async def burn_and_close_accounts(self, token_account:str):
+    async def burn_and_close_accounts(self, token_account: str):
         from agentipy.tools.burn_and_close_account import BurnManager
-        return BurnManager.burn_and_close_account(self, token_account)
+        return await BurnManager.burn_and_close_account(self, token_account)
     
-    async def multiple_burn_and_close_accounts(self, token_accounts):
+    async def multiple_burn_and_close_accounts(self, token_accounts: list[str]):
         from agentipy.tools.burn_and_close_account import BurnManager
-        return BurnManager.process_multiple_accounts(self, token_accounts)
+        return await BurnManager.process_multiple_accounts(self, token_accounts)
     
-    async def create_gibwork_task(self,title: str, content: str, requirements: str, tags: list[str], token_mint_address: Pubkey, token_amount: int):
+    async def create_gibwork_task(self, title: str, content: str, requirements: str, tags: list[str], token_mint_address: Pubkey, token_amount: int):
         from agentipy.tools.create_gibwork import GibworkManager
         return await GibworkManager.create_gibwork_task(self, title, content, requirements, tags, token_mint_address, token_amount)
     
     async def buy_using_moonshot(self, mint_str: str, collateral_amount: float = 0.01, slippage_bps: int = 500):
         from agentipy.tools.use_moonshot import MoonshotManager
-        return MoonshotManager.buy(self, mint_str, collateral_amount, slippage_bps)
+        return await MoonshotManager.buy(self, mint_str, collateral_amount, slippage_bps)
     
     async def sell_using_moonshot(self, mint_str: str, token_balance: float = 0.01, slippage_bps: int = 500):
         from agentipy.tools.use_moonshot import MoonshotManager
-        return MoonshotManager.sell(self, mint_str, token_balance, slippage_bps)
+        return await MoonshotManager.sell(self, mint_str, token_balance, slippage_bps)
     
     async def pythFetchPrice(self, mint_str: str):
         from agentipy.tools.use_pyth import PythManager

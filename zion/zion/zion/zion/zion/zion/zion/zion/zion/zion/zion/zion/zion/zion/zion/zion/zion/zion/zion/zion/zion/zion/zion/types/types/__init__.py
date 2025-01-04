@@ -82,8 +82,3 @@ class JupiterTokenData(BaseModelWithArbitraryTypes):
     address:str
     symbol:str
     name:str
-
-class GibworkCreateTaskResponse:
-    status: str
-    taskId: Optional[str] = None
-    signature: Optional[str] = None
