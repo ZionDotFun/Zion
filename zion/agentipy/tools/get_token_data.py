@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 import requests
@@ -5,6 +6,7 @@ from solders.pubkey import Pubkey  # type: ignore
 
 from agentipy.types import JupiterTokenData
 
+logger = logging.getLogger(__name__)
 
 class TokenDataManager:
     @staticmethod
@@ -53,7 +55,7 @@ class TokenDataManager:
                 return solana_pairs[0].get("baseToken", {}).get("address")
             return None
         except Exception as error:
-            print(f"Error fetching token address from DexScreener: {str(error)}")
+            logger.error(f"Error fetching token address from DexScreener: {str(error)}", exc_info=True)
             return None
         
     @staticmethod

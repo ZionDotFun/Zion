@@ -4,7 +4,7 @@ from langchain.tools import BaseTool
 from solders.pubkey import Pubkey  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
-from agentipy.tools import create_image, fetch_price
+from agentipy.tools import create_image
 from agentipy.utils import toJSON
 from agentipy.utils.meteora_dlmm.types import ActivationType
 
@@ -798,6 +798,48 @@ class SolanaSellUsingMoonshotTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
         
+class SolanaPythGetPriceTool(BaseTool):
+    name: str = "solana_pyth_get_price"
+    description: str = """
+    Fetch the price of a token using the Pyth Oracle.
+
+    Input: A JSON string with:
+    {
+        "mint_address": "string, the mint address of the token"
+    }
+
+    Output:
+    {
+        "price": float, # the token price (if trading),
+        "confidence_interval": float, # the confidence interval (if trading),
+        "status": "UNKNOWN", "TRADING", "HALTED", "AUCTION", "IGNORED",
+        "message": "string, if not trading"
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            mint_address = data["mint_address"]
+
+            result = await self.solana_kit.pythFetchPrice(mint_address)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def run(self, input: str):
+        raise NotImplementedError("This tool only supports asynchronous operations.")
+
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit),
@@ -819,4 +861,5 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaCreateGibworkTaskTool(solana_kit),
         SolanaSellUsingMoonshotTool(solana_kit),
         SolanaBuyUsingMoonshotTool(solana_kit),
+        SolanaPythGetPriceTool(solana_kit)
     ]
