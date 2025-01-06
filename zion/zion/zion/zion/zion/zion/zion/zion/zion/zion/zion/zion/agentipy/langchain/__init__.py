@@ -681,6 +681,123 @@ class SolanaCreateGibworkTaskTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+class SolanaCreateGibworkTaskTool(BaseTool):
+    name: str = "solana_create_gibwork_task"
+    description: str = """
+    Create an new task on Gibwork
+
+    Input: A JSON string with:
+    {
+        "title": "title of the task",
+        "content: "description of the task",
+        "requirements": "requirements to complete the task",
+        "tags": ["tag1", "tag2", ...] # list of tags associated with the task,
+        "token_mint_address": "token mint address for payment",
+        "token_amount": 1000 # amount of token to pay for the task
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = toJSON(input)
+            title = data["title"]
+            content = data["content"]
+            requirements = data["requirements"]
+            tags = data.get("tags", [])
+            token_mint_address = Pubkey.from_string(data["token_mint_address"])
+            token_amount = data["token_amount"]
+            
+            result = await self.solana_kit.create_gibwork_task(title, content, requirements, tags, token_mint_address, token_amount)
+
+            return {
+                "status": "success",
+                "message": "Token accounts burned and closed successfully.",
+                "result": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+
+class SolanaBuyUsingMoonshotTool(BaseTool):
+    name: str = "solana_buy_using_moonshot"
+    description:str = """
+    Buy a token using Moonshot.
+
+    Input: A JSON string with:
+    {
+        "mint_str": "string, the mint address of the token to buy",
+        "collateral_amount": 0.01, # optional, collateral amount in SOL to use for the purchase (default: 0.01)
+        "slippage_bps": 500 # optional, slippage in basis points (default: 500)
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = toJSON(input)
+            mint_str = data["mint_str"]
+            collateral_amount = data.get("collateral_amount", 0.01)
+            slippage_bps = data.get("slippage_bps", 500)
+            
+            result = await self.solana_kit.buy_using_moonshot(mint_str, collateral_amount, slippage_bps)
+
+            return {
+                "status": "success",
+                "message": "Token purchased successfully using Moonshot.",
+                "result": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+
+class SolanaSellUsingMoonshotTool(BaseTool):
+    name: str = "solana_sell_using_moonshot"
+    description:str = """
+    Sell a token using Moonshot.
+
+    Input: A JSON string with:
+    {
+        "mint_str": "string, the mint address of the token to sell",
+        "token_balance": 0.01, # optional, token balance to sell (default: 0.01)
+        "slippage_bps": 500 # optional, slippage in basis points (default: 500)
+    }
+    """
+
+    def __init__(self, solana_kit: SolanaAgentKit):
+        self.solana_kit = solana_kit
+
+    async def _arun(self, input: str):
+        try:
+            data = toJSON(input)
+            mint_str = data["mint_str"]
+            token_balance = data.get("token_balance", 0.01)
+            slippage_bps = data.get("slippage_bps", 500)
+            
+            result = await self.solana_kit.sell_using_moonshot(mint_str, token_balance, slippage_bps)
+
+            return {
+                "status": "success",
+                "message": "Token sold successfully using Moonshot.",
+                "result": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "code": getattr(e, "code", "UNKNOWN_ERROR"),
+            }
+        
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit),
@@ -700,4 +817,6 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaRaydiumBuyTool(solana_kit),
         SolanaRaydiumSellTool(solana_kit),
         SolanaCreateGibworkTaskTool(solana_kit),
+        SolanaSellUsingMoonshotTool(solana_kit),
+        SolanaBuyUsingMoonshotTool(solana_kit),
     ]

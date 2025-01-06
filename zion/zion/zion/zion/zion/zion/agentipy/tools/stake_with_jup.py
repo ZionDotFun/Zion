@@ -5,7 +5,9 @@ from solana.rpc.commitment import Confirmed
 from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
+from agentipy.helpers import fix_asyncio_for_windows
 
+fix_asyncio_for_windows()
 
 class StakeManager:
     @staticmethod

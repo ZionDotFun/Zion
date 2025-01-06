@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 
 import requests
@@ -7,6 +8,7 @@ from solana.transaction import Signature
 
 from agentipy.agent import SolanaAgentKit
 
+logger = logging.getLogger(__name__)
 
 def find_data(data, field):
     if isinstance(data, dict):
@@ -56,15 +58,15 @@ def confirm_txn(agent:SolanaAgentKit ,txn_sig, max_retries=20, retry_interval=3)
             txn_res = client.get_transaction(txn_sig, encoding="json", commitment="confirmed", max_supported_transaction_version=0)
             txn_json = json.loads(txn_res.value.transaction.meta.to_json())
             if txn_json['err'] is None:
-                print("Transaction confirmed... try count:", retries+1)
+                logger.info(f"Transaction confirmed... try count: {retries+1}")
                 return True
-            print("Error: Transaction not confirmed. Retrying...")
+            logger.error("Error: Transaction not confirmed. Retrying...")
             if txn_json['err']:
-                print("Transaction failed.")
+                logger.error("Transaction failed.")
                 return False
         except Exception as e:
-            print("Awaiting confirmation... try count:", retries+1)
+            logger.info(f"Awaiting confirmation... try count: {retries+1}" )
             retries += 1
             time.sleep(retry_interval)
-    print("Max retries reached. Transaction confirmation failed.")
+    logger.error("Max retries reached. Transaction confirmation failed.")
     return None
