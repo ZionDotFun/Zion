@@ -96,3 +96,7 @@ class SolanaAgentKit:
     async def multiple_burn_and_close_accounts(self, token_accounts):
         from agentipy.tools.burn_and_close_account import BurnManager
         return BurnManager.process_multiple_accounts(self, token_accounts)
+    
+    async def create_gibwork_task(self,title: str, content: str, requirements: str, tags: list[str], token_mint_address: Pubkey, token_amount: int):
+        from agentipy.tools.create_gibwork import GibworkManager
+        return GibworkManager.create_gibwork_task(self, title, content, requirements, tags, token_mint_address, token_amount)
