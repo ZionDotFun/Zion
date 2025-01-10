@@ -1,4 +1,5 @@
 import json
+import logging
 import struct
 import time
 from typing import Optional
@@ -20,6 +21,7 @@ from .layouts import (LIQUIDITY_STATE_LAYOUT_V4, MARKET_STATE_LAYOUT_V3,
                       SWAP_LAYOUT)
 from .types import AccountMeta, PoolKeys
 
+logger = logging.getLogger(__name__)
 
 def fetch_pool_keys(client: AsyncClient, pair_address: str) -> Optional[PoolKeys]:
     try:
@@ -55,7 +57,7 @@ def fetch_pool_keys(client: AsyncClient, pair_address: str) -> Optional[PoolKeys
 
         return pool_keys
     except Exception as e:
-        print(f"Error fetching pool keys: {e}")
+        logger.error(f"Error fetching pool keys: {e}", exc_info=True)
         return None
 
 def bytes_of(value):
@@ -85,7 +87,7 @@ def get_pair_address_from_api(mint):
         return None
 
 def get_pair_address_from_rpc(client: AsyncClient, token_address: str) -> str:
-    print("Getting pair address from RPC...")
+    logger.info("Getting pair address from RPC...")
     BASE_OFFSET = 400
     QUOTE_OFFSET = 432
     DATA_LENGTH_FILTER = 752
@@ -105,7 +107,7 @@ def get_pair_address_from_rpc(client: AsyncClient, token_address: str) -> str:
             if accounts:
                 return str(accounts[0].pubkey)
         except Exception as e:
-            print(f"Error fetching AMM ID: {e}")
+            logger.error(f"Error fetching AMM ID: {e}", exc_info=True)
         return None
 
     pair_address = fetch_amm_id(token_address, QUOTE_MINT)
@@ -153,7 +155,7 @@ def make_swap_instruction(
         )
         return Instruction(RAY_V4, data, keys)
     except Exception as e:
-        print(f"Error occurred: {e}")
+        logger.error(f"Error occurred: {e}", exc_info=True)
         return None
 
 def get_token_balance(agent: SolanaAgentKit, mint_str: str) -> float | None:
@@ -171,7 +173,7 @@ def get_token_balance(agent: SolanaAgentKit, mint_str: str) -> float | None:
                 return float(token_amount)
         return None
     except Exception as e:
-        print(f"Error fetching token balance: {e}")
+        logger.error(f"Error fetching token balance: {e}", exc_info=True)
         return None
 
 def confirm_txn(client: AsyncClient, txn_sig: Signature, max_retries: int = 20, retry_interval: int = 3) -> bool:
@@ -183,19 +185,19 @@ def confirm_txn(client: AsyncClient, txn_sig: Signature, max_retries: int = 20, 
             txn_json = json.loads(txn_res.value.transaction.meta.to_json())
             
             if txn_json['err'] is None:
-                print("Transaction confirmed... try count:", retries)
+                logger.info(f"Transaction confirmed... try count: {retries}")
                 return True
             
-            print("Error: Transaction not confirmed. Retrying...")
+            logger.error("Error: Transaction not confirmed. Retrying...")
             if txn_json['err']:
-                print("Transaction failed.")
+                logger.error("Transaction failed.")
                 return False
         except Exception as e:
-            print("Awaiting confirmation... try count:", retries)
+            logger.error(f"Awaiting confirmation... try count: {retries}")
             retries += 1
             time.sleep(retry_interval)
     
-    print("Max retries reached. Transaction confirmation failed.")
+    logger.error("Max retries reached. Transaction confirmation failed.")
     return None
 
 def get_token_reserves(client: AsyncClient, pool_keys: PoolKeys) -> tuple:
@@ -232,12 +234,12 @@ def get_token_reserves(client: AsyncClient, pool_keys: PoolKeys) -> tuple:
             quote_reserve = sol_account_balance 
             token_decimal = base_decimal
 
-        print(f"Base Mint: {base_mint} | Quote Mint: {quote_mint}")
-        print(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal}")
+        logger.info(f"Base Mint: {base_mint} | Quote Mint: {quote_mint}")
+        logger.info(f"Base Reserve: {base_reserve} | Quote Reserve: {quote_reserve} | Token Decimal: {token_decimal}")
         return base_reserve, quote_reserve, token_decimal
 
     except Exception as e:
-        print(f"Error occurred: {e}")
+        logger.error(f"Error occurred: {e}", exc_info=True)
         return None, None, None
     
 def sol_for_tokens(spend_sol_amount, base_vault_balance, quote_vault_balance, swap_fee=0.25):

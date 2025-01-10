@@ -3,6 +3,7 @@ from typing import Optional
 
 from solders.pubkey import Pubkey as PublicKey  # type: ignore
 from spl.token.client import Token
+from spl.token.constants import TOKEN_PROGRAM_ID
 
 from agentipy.agent import SolanaAgentKit
 from agentipy.utils import meteora_dlmm as DLMM
@@ -43,25 +44,24 @@ class MeteoraManager:
         """
         connection = agent.connection
 
-        # Fetch token mint info
-        token_a_mint_info = await Token.get_mint_info(connection, token_a_mint)
-        token_b_mint_info = await Token.get_mint_info(connection, token_b_mint)
+        token_a = Token(conn=connection,pubkey=token_a_mint,program_id=TOKEN_PROGRAM_ID,payer=agent.wallet)
+        token_b = Token(conn=connection,pubkey=token_b_mint,program_id=TOKEN_PROGRAM_ID,payer=agent.wallet)
 
-        # Compute initial price per lamport
+        token_a_mint_info = await token_a.get_mint_info()
+        token_b_mint_info = await token_b.get_mint_info()
+
         init_price = DLMM.get_price_per_lamport(
             token_a_mint_info.decimals,
             token_b_mint_info.decimals,
             initial_price
         )
 
-        # Get bin ID for activation
         activate_bin_id = DLMM.get_bin_id_from_price(
             initial_price,
             bin_step,
             not price_rounding_up
         )
 
-        # Create transaction for initializing the pool
         init_pool_tx = await DLMM.create_customizable_permissionless_lb_pair(
             connection=connection,
             bin_step=bin_step,
@@ -75,7 +75,6 @@ class MeteoraManager:
             activation_point=activation_point
         )
 
-        # Send and confirm the transaction
         try:
             tx_signature = await connection.send_and_confirm_transaction(
                 init_pool_tx,
