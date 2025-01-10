@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from decimal import ROUND_HALF_EVEN, Decimal, InvalidOperation, getcontext
 
@@ -12,6 +13,8 @@ from .constants import LAMPORTS_PER_SOL
 
 getcontext().prec = 50
 getcontext().rounding = ROUND_HALF_EVEN
+
+logger = logging.getLogger(__name__)
 
 class TradeDirection:
     BUY = 'BUY'
@@ -78,7 +81,7 @@ def get_curve_state(agent: SolanaAgentKit, mint_str: str):
         return curve_state
     
     except Exception as e:
-        print(e)
+        logger.error(f"Error occured while fetching curve data: {e}", exc_info=True)
         return None
 
 def get_collateral_amount_by_tokens(mint_str: str, token_amount: float, direction: TradeDirection):

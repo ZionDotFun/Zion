@@ -931,6 +931,685 @@ class SolanaPythGetPriceTool(BaseTool):
             "This tool only supports async execution via _arun. Please use the async interface."
         )
 
+class SolanaHeliusGetBalancesTool(BaseTool):
+    name: str = "solana_helius_get_balances"
+    description: str = """
+    Fetch the balances for a given Solana address.
+
+    Input: A JSON string with:
+    {
+        "address": "string, the Solana address"
+    }
+
+    Output: {
+        "balances": List[dict], # the list of token balances for the address
+        "status": "success" or "error",
+        "message": "Error message if any"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            address = data["address"]
+
+            result = await self.solana_kit.get_balances(address)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+
+class SolanaHeliusGetAddressNameTool(BaseTool):
+    name: str = "solana_helius_get_address_name"
+    description: str = """
+    Fetch the name of a given Solana address.
+
+    Input: A JSON string with:
+    {
+        "address": "string, the Solana address"
+    }
+
+    Output: {
+        "name": "string, the name of the address",
+        "status": "success" or "error",
+        "message": "Error message if any"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            address = data["address"]
+
+            result = await self.solana_kit.get_address_name(address)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+
+class SolanaHeliusGetNftEventsTool(BaseTool):
+    name: str = "solana_helius_get_nft_events"
+    description: str = """
+    Fetch NFT events based on the given parameters.
+
+    Input: A JSON string with:
+    {
+        "accounts": "List of addresses to fetch NFT events for",
+        "types": "Optional list of event types",
+        "sources": "Optional list of sources",
+        "start_slot": "Optional start slot",
+        "end_slot": "Optional end slot",
+        "start_time": "Optional start time",
+        "end_time": "Optional end time",
+        "first_verified_creator": "Optional list of verified creators",
+        "verified_collection_address": "Optional list of verified collection addresses",
+        "limit": "Optional limit for results",
+        "sort_order": "Optional sort order",
+        "pagination_token": "Optional pagination token"
+    }
+
+    Output: {
+        "events": List[dict], # list of NFT events matching the criteria
+        "status": "success" or "error",
+        "message": "Error message if any"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            accounts = data["accounts"]
+            types = data.get("types")
+            sources = data.get("sources")
+            start_slot = data.get("start_slot")
+            end_slot = data.get("end_slot")
+            start_time = data.get("start_time")
+            end_time = data.get("end_time")
+            first_verified_creator = data.get("first_verified_creator")
+            verified_collection_address = data.get("verified_collection_address")
+            limit = data.get("limit")
+            sort_order = data.get("sort_order")
+            pagination_token = data.get("pagination_token")
+
+            result = await self.solana_kit.get_nft_events(
+                accounts, types, sources, start_slot, end_slot, start_time, end_time, first_verified_creator, verified_collection_address, limit, sort_order, pagination_token
+            )
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+
+class SolanaHeliusGetMintlistsTool(BaseTool):
+    name: str = "solana_helius_get_mintlists"
+    description: str = """
+    Fetch mintlists for a given list of verified creators.
+
+    Input: A JSON string with:
+    {
+        "first_verified_creators": "List of first verified creator addresses",
+        "verified_collection_addresses": "Optional list of verified collection addresses",
+        "limit": "Optional limit for results",
+        "pagination_token": "Optional pagination token"
+    }
+
+    Output: {
+        "mintlists": List[dict], # list of mintlists matching the criteria
+        "status": "success" or "error",
+        "message": "Error message if any"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            first_verified_creators = data["first_verified_creators"]
+            verified_collection_addresses = data.get("verified_collection_addresses")
+            limit = data.get("limit")
+            pagination_token = data.get("pagination_token")
+
+            result = await self.solana_kit.get_mintlists(first_verified_creators, verified_collection_addresses, limit, pagination_token)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+class SolanaHeliusGetNFTFingerprintTool(BaseTool):
+    name: str = "solana_helius_get_nft_fingerprint"
+    description: str = """
+    Fetch NFT fingerprint for a list of mint addresses.
+
+    Input: A JSON string with:
+    {
+        "mints": ["string, the mint addresses of the NFTs"]
+    }
+
+    Output:
+    {
+        "fingerprint": "list of NFT fingerprint data"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            mints = data["mints"]
+
+            result = await self.solana_kit.get_nft_fingerprint(mints)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
+class SolanaHeliusGetActiveListingsTool(BaseTool):
+    name: str = "solana_helius_get_active_listings"
+    description: str = """
+    Fetch active NFT listings from various marketplaces.
+
+    Input: A JSON string with:
+    {
+        "first_verified_creators": ["string, the addresses of verified creators"],
+        "verified_collection_addresses": ["optional list of verified collection addresses"],
+        "marketplaces": ["optional list of marketplaces"],
+        "limit": "optional limit to the number of listings",
+        "pagination_token": "optional token for pagination"
+    }
+
+    Output:
+    {
+        "active_listings": "list of active NFT listings"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            first_verified_creators = data["first_verified_creators"]
+            verified_collection_addresses = data.get("verified_collection_addresses", [])
+            marketplaces = data.get("marketplaces", [])
+            limit = data.get("limit", None)
+            pagination_token = data.get("pagination_token", None)
+
+            result = await self.solana_kit.get_active_listings(
+                first_verified_creators, verified_collection_addresses, marketplaces, limit, pagination_token
+            )
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
+class SolanaHeliusGetNFTMetadataTool(BaseTool):
+    name: str = "solana_helius_get_nft_metadata"
+    description: str = """
+    Fetch metadata for NFTs based on their mint accounts.
+
+    Input: A JSON string with:
+    {
+        "mint_accounts": ["string, the mint addresses of the NFTs"]
+    }
+
+    Output:
+    {
+        "metadata": "list of NFT metadata"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            mint_accounts = data["mint_accounts"]
+
+            result = await self.solana_kit.get_nft_metadata(mint_accounts)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
+class SolanaHeliusGetRawTransactionsTool(BaseTool):
+    name: str = "solana_helius_get_raw_transactions"
+    description: str = """
+    Fetch raw transactions for a list of accounts.
+
+    Input: A JSON string with:
+    {
+        "accounts": ["string, the account addresses"],
+        "start_slot": "optional start slot",
+        "end_slot": "optional end slot",
+        "start_time": "optional start time",
+        "end_time": "optional end time",
+        "limit": "optional limit",
+        "sort_order": "optional sort order",
+        "pagination_token": "optional pagination token"
+    }
+
+    Output:
+    {
+        "transactions": "list of raw transactions"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            accounts = data["accounts"]
+            start_slot = data.get("start_slot", None)
+            end_slot = data.get("end_slot", None)
+            start_time = data.get("start_time", None)
+            end_time = data.get("end_time", None)
+            limit = data.get("limit", None)
+            sort_order = data.get("sort_order", None)
+            pagination_token = data.get("pagination_token", None)
+
+            result = await self.solana_kit.get_raw_transactions(
+                accounts, start_slot, end_slot, start_time, end_time, limit, sort_order, pagination_token
+            )
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
+class SolanaHeliusGetParsedTransactionsTool(BaseTool):
+    name: str = "solana_helius_get_parsed_transactions"
+    description: str = """
+    Fetch parsed transactions for a list of transaction IDs.
+
+    Input: A JSON string with:
+    {
+        "transactions": ["string, the transaction IDs"],
+        "commitment": "optional commitment level"
+    }
+
+    Output:
+    {
+        "parsed_transactions": "list of parsed transactions"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            transactions = data["transactions"]
+            commitment = data.get("commitment", None)
+
+            result = await self.solana_kit.get_parsed_transactions(transactions, commitment)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
+class SolanaHeliusGetParsedTransactionHistoryTool(BaseTool):
+    name: str = "solana_helius_get_parsed_transaction_history"
+    description: str = """
+    Fetch parsed transaction history for a given address.
+
+    Input: A JSON string with:
+    {
+        "address": "string, the account address",
+        "before": "optional before transaction timestamp",
+        "until": "optional until transaction timestamp",
+        "commitment": "optional commitment level",
+        "source": "optional source of transaction",
+        "type": "optional type of transaction"
+    }
+
+    Output:
+    {
+        "transaction_history": "list of parsed transaction history"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            address = data["address"]
+            before = data.get("before", "")
+            until = data.get("until", "")
+            commitment = data.get("commitment", "")
+            source = data.get("source", "")
+            type = data.get("type", "")
+
+            result = await self.solana_kit.get_parsed_transaction_history(
+                address, before, until, commitment, source, type
+            )
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaHeliusCreateWebhookTool(BaseTool):
+    name: str = "solana_helius_create_webhook"
+    description: str = """
+    Create a webhook for transaction events.
+
+    Input: A JSON string with:
+    {
+        "webhook_url": "URL to send the webhook data",
+        "transaction_types": "List of transaction types to listen for",
+        "account_addresses": "List of account addresses to monitor",
+        "webhook_type": "Type of webhook",
+        "txn_status": "optional, transaction status to filter by",
+        "auth_header": "optional, authentication header for the webhook"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "data": "Webhook creation response"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            webhook_url = data["webhook_url"]
+            transaction_types = data["transaction_types"]
+            account_addresses = data["account_addresses"]
+            webhook_type = data["webhook_type"]
+            txn_status = data.get("txn_status", "all")
+            auth_header = data.get("auth_header", None)
+
+            result = await self.solana_kit.create_webhook(
+                webhook_url, transaction_types, account_addresses, webhook_type, txn_status, auth_header
+            )
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaHeliusGetAllWebhooksTool(BaseTool):
+    name: str = "solana_helius_get_all_webhooks"
+    description: str = """
+    Fetch all webhooks created in the system.
+
+    Input: None (No parameters required)
+
+    Output:
+    {
+        "status": "success",
+        "data": "List of all webhooks"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            result = await self.solana_kit.get_all_webhooks()
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaHeliusGetWebhookTool(BaseTool):
+    name: str = "solana_helius_get_webhook"
+    description: str = """
+    Retrieve a specific webhook by ID.
+
+    Input: A JSON string with:
+    {
+        "webhook_id": "ID of the webhook to retrieve"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "data": "Webhook details"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            webhook_id = data["webhook_id"]
+
+            result = await self.solana_kit.get_webhook(webhook_id)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+class SolanaHeliusEditWebhookTool(BaseTool):
+    name: str = "solana_helius_edit_webhook"
+    description: str = """
+    Edit an existing webhook by its ID.
+
+    Input: A JSON string with:
+    {
+        "webhook_id": "ID of the webhook to edit",
+        "webhook_url": "Updated URL for the webhook",
+        "transaction_types": "Updated list of transaction types",
+        "account_addresses": "Updated list of account addresses",
+        "webhook_type": "Updated webhook type",
+        "txn_status": "optional, updated transaction status filter",
+        "auth_header": "optional, updated authentication header"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "data": "Updated webhook details"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            webhook_id = data["webhook_id"]
+            webhook_url = data["webhook_url"]
+            transaction_types = data["transaction_types"]
+            account_addresses = data["account_addresses"]
+            webhook_type = data["webhook_type"]
+            txn_status = data.get("txn_status", "all")
+            auth_header = data.get("auth_header", None)
+
+            result = await self.solana_kit.edit_webhook(
+                webhook_id, webhook_url, transaction_types, account_addresses, webhook_type, txn_status, auth_header
+            )
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaHeliusDeleteWebhookTool(BaseTool):
+    name: str = "solana_helius_delete_webhook"
+    description: str = """
+    Delete a webhook by its ID.
+
+    Input: A JSON string with:
+    {
+        "webhook_id": "ID of the webhook to delete"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "data": "Webhook deletion confirmation"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            webhook_id = data["webhook_id"]
+
+            result = await self.solana_kit.delete_webhook(webhook_id)
+            return {
+                "status": "success",
+                "data": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit=solana_kit),
