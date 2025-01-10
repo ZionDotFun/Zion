@@ -1,11 +1,14 @@
 import base64
 import json
 
+import aiohttp
 from solana.rpc.commitment import Confirmed
 from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
+from agentipy.helpers import fix_asyncio_for_windows
 
+fix_asyncio_for_windows()
 
 class AssetLender:
     @staticmethod
@@ -25,7 +28,9 @@ class AssetLender:
             headers = {"Content-Type": "application/json"}
             payload = json.dumps({"account": str(agent.wallet.pubkey())})
 
-            async with agent.session.post(url, headers=headers, data=payload) as response:
+            session = aiohttp.ClientSession()
+
+            async with session.post(url, headers=headers, data=payload) as response:
                 if response.status != 200:
                     raise Exception(f"Lulo API Error: {response.status}")
                 data = await response.json()

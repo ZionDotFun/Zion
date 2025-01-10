@@ -47,10 +47,10 @@ def get_recent_prioritization_fees(addresses=None):
         
         return response_data['result']
     except requests.RequestException as e:
-        print(f"Request failed: {e}")
+        logger.error(f"Request failed: {e}", exc_info=True)
         raise
     except ValueError as e:
-        print(f"Invalid response format: {e}")
+        logger.error(f"Invalid response format: {e}", exc_info=True)
         raise
 
 async def get_priority_fees(connection: AsyncClient) -> dict:
@@ -96,7 +96,7 @@ async def get_priority_fees(connection: AsyncClient) -> dict:
             },
         }
     except Exception as e:
-        print("Error getting priority fees:", e)
+        logger.error(f"Error getting priority fees {e}", exc_info=True)
         raise
 
 async def send_tx(agent:SolanaAgentKit, tx: Transaction, other_keypairs: list[Keypair] = None) -> str:
@@ -135,7 +135,7 @@ async def send_tx(agent:SolanaAgentKit, tx: Transaction, other_keypairs: list[Ke
         await agent.connection.confirm_transaction(tx_id, commitment=Confirmed)
         return tx_id
     except Exception as e:
-        print("Error sending transaction:", e)
+        logger.error(f"Error sending transaction: {e}", exc_info=True)
         raise
 
 async def sign_and_send_transaction(
