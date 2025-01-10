@@ -99,7 +99,7 @@ class SolanaAgentKit:
     
     async def create_gibwork_task(self,title: str, content: str, requirements: str, tags: list[str], token_mint_address: Pubkey, token_amount: int):
         from agentipy.tools.create_gibwork import GibworkManager
-        return GibworkManager.create_gibwork_task(self, title, content, requirements, tags, token_mint_address, token_amount)
+        return await GibworkManager.create_gibwork_task(self, title, content, requirements, tags, token_mint_address, token_amount)
     
     async def buy_using_moonshot(self, mint_str: str, collateral_amount: float = 0.01, slippage_bps: int = 500):
         from agentipy.tools.use_moonshot import MoonshotManager
@@ -108,3 +108,7 @@ class SolanaAgentKit:
     async def sell_using_moonshot(self, mint_str: str, token_balance: float = 0.01, slippage_bps: int = 500):
         from agentipy.tools.use_moonshot import MoonshotManager
         return MoonshotManager.sell(self, mint_str, token_balance, slippage_bps)
+    
+    async def pythFetchPrice(self, mint_str: str):
+        from agentipy.tools.use_pyth import PythManager
+        return await PythManager.get_price(mint_str)

@@ -62,10 +62,10 @@ class SolanaAgentKit:
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch price: {e}")
 
-    async def transfer(self, to: Pubkey, amount: int, mint: Optional[Pubkey] = None):
+    async def transfer(self, to: str, amount: int, mint: Optional[Pubkey] = None):
         from agentipy.tools.transfer import TokenTransferManager
         try:
-            return await TokenTransferManager.execute_transfer(self, to, amount, mint)
+            return await TokenTransferManager.transfer(self, to, amount, mint)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to execute transfer: {e}")
 
@@ -79,7 +79,7 @@ class SolanaAgentKit:
     async def lend_assets(self, amount: int):
         from agentipy.tools.lend import AssetLender
         try:
-            return await AssetLender.lend(self, amount)
+            return await AssetLender.lend_asset(self, amount)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to lend asset: {e}")
 
