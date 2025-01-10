@@ -27,6 +27,7 @@ class SolanaAgentKit:
         self.wallet = Keypair.from_base58_string(private_key)
         self.wallet_address = self.wallet.pubkey()
         self.openai_api_key = openai_api_key
+        self.rpc_url = rpc_url
 
     async def request_faucet_funds(self):
         from agentipy.tools.request_faucet_funds import FaucetManager
@@ -79,3 +80,12 @@ class SolanaAgentKit:
     async def create_meteora_dlmm_pool(self, bin_step:int, token_a_mint: Pubkey,token_b_mint: Pubkey,initial_price: float,price_rounding_up: bool,fee_bps: int,activation_type: ActivationType,has_alpha_vault: bool,activation_point: Optional[int]):
         from agentipy.tools.create_meteora_dlmm_pool import MeteoraManager
         return await MeteoraManager.create_meteora_dlmm_pool(self,bin_step,token_a_mint,token_b_mint,initial_price,price_rounding_up,fee_bps,activation_type,has_alpha_vault,activation_point)
+    
+    async def buy_with_raydium(self, pair_address: str, sol_in: float = .01, slippage: int = 5):
+        from agentipy.tools.use_raydium import RaydiumManager
+        return await RaydiumManager.buy_with_raydium(self, pair_address, sol_in, slippage)
+    
+    async def sell_with_raydium(self, pair_address: str,percentage: int = 100, slippage: int = 5):
+        from agentipy.tools.use_raydium import RaydiumManager
+        return await RaydiumManager.sell_with_raydium(self, pair_address, percentage, slippage)
+        

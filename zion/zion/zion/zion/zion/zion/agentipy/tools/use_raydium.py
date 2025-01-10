@@ -1,4 +1,5 @@
 import base64
+import logging
 import os
 
 from solana.rpc.api import Client
@@ -28,6 +29,7 @@ from agentipy.utils.raydium.utils import (confirm_txn, fetch_pool_keys,
                                           make_swap_instruction,
                                           sol_for_tokens, tokens_for_sol)
 
+logger = logging.getLogger(__name__)
 
 class RaydiumManager:
     """
@@ -159,7 +161,7 @@ class RaydiumManager:
             return confirm_txn(txn_sig)
 
         except Exception as e:
-            print("Error during buy transaction:", e)
+            logger.error(f"Error during buy transaction {e}", exc_info=True)
             return False
 
     @staticmethod
@@ -179,45 +181,45 @@ class RaydiumManager:
         try:
             client = Client(agent.rpc_url)
             payer_keypair = agent.wallet
-            print(f"Starting sell transaction for pair address: {pair_address}")
+            logger.info(f"Starting sell transaction for pair address: {pair_address}")
             if not (1 <= percentage <= 100):
-                print("Percentage must be between 1 and 100.")
+                logger.error("Percentage must be between 1 and 100.")
                 return False
 
-            print("Fetching pool keys...")
+            logger.info("Fetching pool keys...")
             pool_keys = fetch_pool_keys(pair_address)
             if pool_keys is None:
-                print("No pool keys found...")
+                logger.error("No pool keys found...")
                 return False
-            print("Pool keys fetched successfully.")
+            logger.info("Pool keys fetched successfully.")
 
             mint = pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint
             
-            print("Retrieving token balance...")
+            logger.info("Retrieving token balance...")
             token_balance = get_token_balance(str(mint))
-            print("Token Balance:", token_balance)    
+            logger.info(f"Token Balance: {token_balance}")
             
             if token_balance == 0 or token_balance is None:
-                print("No token balance available to sell.")
+                logger.error("No token balance available to sell.")
                 return False
             
             token_balance = token_balance * (percentage / 100)
-            print(f"Selling {percentage}% of the token balance, adjusted balance: {token_balance}")
+            logger.info(f"Selling {percentage}% of the token balance, adjusted balance: {token_balance}")
 
-            print("Calculating transaction amounts...")
+            logger.info("Calculating transaction amounts...")
             base_reserve, quote_reserve, token_decimal = get_token_reserves(pool_keys)
             amount_out = tokens_for_sol(token_balance, base_reserve, quote_reserve)
-            print(f"Raw Amount Out: {amount_out}")
+            logger.info(f"Raw Amount Out: {amount_out}")
             
             slippage_adjustment = 1 - (slippage / 100)
             amount_out_with_slippage = amount_out * slippage_adjustment
             minimum_amount_out = int(amount_out_with_slippage * SOL_DECIMAL)
         
             amount_in = int(token_balance * 10**token_decimal)
-            print(f"Amount In: {amount_in} | Minimum Amount Out: {minimum_amount_out}")
+            logger.info(f"Amount In: {amount_in} | Minimum Amount Out: {minimum_amount_out}")
             token_account = get_associated_token_address(payer_keypair.pubkey(), mint)
             
-            print("Generating seed and creating WSOL account...")
+            logger.info("Generating seed and creating WSOL account...")
             seed = base64.urlsafe_b64encode(os.urandom(24)).decode('utf-8')
             wsol_token_account = Pubkey.create_with_seed(payer_keypair.pubkey(), seed, TOKEN_PROGRAM_ID)
             balance_needed = Token.get_min_balance_rent_for_exempt_for_account(client)
@@ -243,10 +245,10 @@ class RaydiumManager:
                 )
             )
 
-            print("Creating swap instructions...")
+            logger.info("Creating swap instructions...")
             swap_instructions = make_swap_instruction(amount_in, minimum_amount_out, token_account, wsol_token_account, pool_keys, payer_keypair)
             
-            print("Preparing to close WSOL account after swap...")
+            logger.info("Preparing to close WSOL account after swap...")
             close_wsol_account_instr = close_account(CloseAccountParams(TOKEN_PROGRAM_ID, wsol_token_account, payer_keypair.pubkey(), payer_keypair.pubkey()))
             
             instructions = [
@@ -259,13 +261,13 @@ class RaydiumManager:
             ]
             
             if percentage == 100:
-                print("Preparing to close token account after swap...")
+                logger.info("Preparing to close token account after swap...")
                 close_token_account_instr = close_account(
                     CloseAccountParams(TOKEN_PROGRAM_ID, token_account, payer_keypair.pubkey(), payer_keypair.pubkey())
                 )
                 instructions.append(close_token_account_instr)
 
-            print("Compiling transaction message...")
+            logger.info("Compiling transaction message...")
             compiled_message = MessageV0.try_compile(
                 payer_keypair.pubkey(),
                 instructions,
@@ -273,19 +275,19 @@ class RaydiumManager:
                 client.get_latest_blockhash().value.blockhash,
             )
             
-            print("Sending transaction...")
+            logger.info("Sending transaction...")
             txn_sig = client.send_transaction(
                 txn = VersionedTransaction(compiled_message, [payer_keypair]), 
                 opts = TxOpts(skip_preflight=True)
                 ).value
-            print("Transaction Signature:", txn_sig)
+            logger.info(f"Transaction Signature: {txn_sig}")
 
-            print("Confirming transaction...")
+            logger.info("Confirming transaction...")
             confirmed = confirm_txn(txn_sig)
             
-            print("Transaction confirmed:", confirmed)
+            logger.info(f"Transaction confirmed: {confirmed}")
             return confirmed
             
         except Exception as e:
-            print("Error occurred during transaction:", e)
+            logger.error(f"Error occurred during transaction {e}", exc_info=True)
             return False
