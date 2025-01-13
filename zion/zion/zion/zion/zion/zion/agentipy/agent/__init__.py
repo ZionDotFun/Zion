@@ -1,6 +1,6 @@
+import os
 from typing import List, Optional
 
-import base58
 from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
@@ -27,14 +27,25 @@ class SolanaAgentKit:
         openai_api_key (str): OpenAI API key for additional functionality.
     """
 
-    def __init__(self, private_key: str, rpc_url: str = "https://api.mainnet-beta.solana.com", openai_api_key: str = "", helius_api_key: str = "", helius_rpc_url: str = ""):
-        self.connection = AsyncClient(rpc_url)
-        self.wallet = Keypair.from_base58_string(private_key)
+    def __init__(
+        self,
+        private_key: Optional[str] = None,
+        rpc_url: Optional[str] = None,
+        openai_api_key: Optional[str] = None,
+        helius_api_key: Optional[str] = None,
+        helius_rpc_url: Optional[str] = None
+    ):
+        self.rpc_url = rpc_url or os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
+        self.wallet = Keypair.from_base58_string(private_key or os.getenv("SOLANA_PRIVATE_KEY", ""))
         self.wallet_address = self.wallet.pubkey()
-        self.openai_api_key = openai_api_key
-        self.rpc_url = rpc_url
-        self.helius_api_key = helius_api_key
-        self.helius_rpc_url = helius_rpc_url
+        self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY", "")
+        self.helius_api_key = helius_api_key or os.getenv("HELIUS_API_KEY", "")
+        self.helius_rpc_url = helius_rpc_url or os.getenv("HELIUS_RPC_URL", "")
+
+        self.connection = AsyncClient(self.rpc_url)
+
+        if not self.wallet or not self.wallet_address:
+            raise SolanaAgentKitError("A valid private key must be provided.")
 
     async def request_faucet_funds(self):
         from agentipy.tools.request_faucet_funds import FaucetManager

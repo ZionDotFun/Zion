@@ -75,21 +75,21 @@ class SolanaAgentKit:
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch price: {e}")
 
-    async def transfer(self, to: str, amount: int, mint: Optional[Pubkey] = None):
+    async def transfer(self, to: str, amount: float, mint: Optional[Pubkey] = None):
         from agentipy.tools.transfer import TokenTransferManager
         try:
             return await TokenTransferManager.transfer(self, to, amount, mint)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to execute transfer: {e}")
 
-    async def trade(self, output_mint: Pubkey, input_amount: int, input_mint: Optional[Pubkey] = None, slippage_bps: int = DEFAULT_OPTIONS["SLIPPAGE_BPS"]):
+    async def trade(self, output_mint: Pubkey, input_amount: float, input_mint: Optional[Pubkey] = None, slippage_bps: int = DEFAULT_OPTIONS["SLIPPAGE_BPS"]):
         from agentipy.tools.trade import TradeManager
         try:
             return await TradeManager.trade(self, output_mint, input_amount, input_mint, slippage_bps)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to trade: {e}")
 
-    async def lend_assets(self, amount: int):
+    async def lend_assets(self, amount: float):
         from agentipy.tools.lend import AssetLender
         try:
             return await AssetLender.lend_asset(self, amount)
