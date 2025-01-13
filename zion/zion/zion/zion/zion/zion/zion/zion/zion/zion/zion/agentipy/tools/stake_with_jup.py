@@ -2,6 +2,7 @@ import base64
 
 import aiohttp
 from solana.rpc.commitment import Confirmed
+from solders.message import MessageV0, to_bytes_versioned  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
@@ -38,20 +39,21 @@ class StakeManager:
                     data = await res.json()
 
             
-            txn = VersionedTransaction.deserialize(base64.b64decode(data["transaction"]))
+            txn = VersionedTransaction.from_bytes(base64.b64decode(data["transaction"]))
 
             latest_blockhash = await agent.connection.get_latest_blockhash()
-            txn.message.recent_blockhash = latest_blockhash.value.blockhash
+            
+            signature = agent.wallet.sign_message(to_bytes_versioned(txn.message))
+            signed_tx = VersionedTransaction.populate(txn.message, [signature])
 
-            txn.sign([agent.wallet])
-
-            signature = await agent.connection.send_raw_transaction(
-                txn.serialize(),
-                opts={"skip_preflight": False, "max_retries": 3},
+            tx_resp = await agent.connection.send_transaction(
+                signed_tx,
             )
 
+            tx_id = tx_resp.value 
+
             await agent.connection.confirm_transaction(
-                signature,
+                tx_id,
                 commitment=Confirmed,
                 last_valid_block_height=latest_blockhash.value.last_valid_block_height,
             )

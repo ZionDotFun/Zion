@@ -343,3 +343,17 @@ class SolanaAgentKit:
             return HeliusManager.delete_webhook(self,webhook_id)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def fetch_token_report_summary(mint:str):
+        from agentipy.tools.rugcheck import RugCheckManager
+        try:
+            return RugCheckManager.fetch_token_report_summary(mint)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def fetch_token_detailed_report(mint:str):
+        from agentipy.tools.rugcheck import RugCheckManager
+        try:
+            return RugCheckManager.fetch_token_detailed_report(mint)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
