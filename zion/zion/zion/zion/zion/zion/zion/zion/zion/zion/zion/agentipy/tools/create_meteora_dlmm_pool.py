@@ -1,3 +1,4 @@
+import logging
 from math import ceil
 from typing import Optional
 
@@ -9,6 +10,7 @@ from agentipy.agent import SolanaAgentKit
 from agentipy.utils import meteora_dlmm as DLMM
 from agentipy.utils.meteora_dlmm.types import ActivationType
 
+logger = logging.getLogger(__name__)
 
 class MeteoraManager:
     @staticmethod
@@ -81,7 +83,7 @@ class MeteoraManager:
                 [agent.wallet]
             )
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}", exc_info=True)
             raise e
 
         return tx_signature

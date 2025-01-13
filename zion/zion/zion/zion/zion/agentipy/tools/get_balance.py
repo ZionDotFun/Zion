@@ -1,10 +1,8 @@
-from typing import Dict, Optional
+from typing import Optional
 
-from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Confirmed
-from solana.rpc.types import TokenAccountOpts
 from solders.pubkey import Pubkey  # type: ignore
-from solders.rpc.responses import GetTokenAccountsByOwnerResp  # type: ignore
+from spl.token.instructions import get_associated_token_address
 
 from agentipy.agent import SolanaAgentKit
 from agentipy.constants import LAMPORTS_PER_SOL
@@ -13,14 +11,14 @@ from agentipy.constants import LAMPORTS_PER_SOL
 class BalanceFetcher:
     @staticmethod
     async def get_balance(
-    agent: SolanaAgentKit,
-    token_address: Optional[Pubkey] = None
-) -> Optional[float]:
+        agent: SolanaAgentKit,
+        token_address: Optional[Pubkey] = None
+    ) -> Optional[float]:
         """
         Get the balance of SOL or an SPL token for the agent's wallet.
 
         Args:
-            agent: SolanaAgentKit instance
+            agent: SolanaAgentKit instance.
             token_address: Optional SPL token mint address. If not provided, returns SOL balance.
 
         Returns:
@@ -37,8 +35,13 @@ class BalanceFetcher:
                 )
                 return response.value / LAMPORTS_PER_SOL
 
+            token_account_pubkey = get_associated_token_address(
+                owner=agent.wallet_address,
+                mint=token_address
+            )
+
             response = await agent.connection.get_token_account_balance(
-                token_address,
+                token_account_pubkey,
                 commitment=Confirmed
             )
 
@@ -48,4 +51,4 @@ class BalanceFetcher:
             return float(response.value.ui_amount)
 
         except Exception as error:
-            raise Exception(f"Failed to get balance: {str(error)}") from error
+            raise Exception(f"Failed to get balance for {'SOL' if not token_address else 'SPL token'}: {str(error)}") from error
