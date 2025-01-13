@@ -69,12 +69,12 @@ class TradeManager:
                     swap_data = await swap_response.json()
 
             swap_transaction_buf = base64.b64decode(swap_data["swapTransaction"])
-            transaction = VersionedTransaction.deserialize(swap_transaction_buf)
+            transaction = VersionedTransaction.from_bytes(swap_transaction_buf)
 
             latest_blockhash = await agent.connection.get_latest_blockhash()
             transaction.message.recent_blockhash = latest_blockhash.value.blockhash
 
-            transaction.sign([agent.wallet])
+            transaction.sign(agent.wallet)
 
             signature = await agent.connection.send_raw_transaction(
                 transaction.serialize(), opts={"skip_preflight": False, "max_retries": 3}

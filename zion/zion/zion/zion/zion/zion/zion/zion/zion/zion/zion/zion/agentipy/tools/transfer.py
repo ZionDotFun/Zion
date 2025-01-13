@@ -1,196 +1,70 @@
-import logging
-import math
-from typing import Optional
-
 from solana.rpc.async_api import AsyncClient
-from solana.rpc.commitment import Confirmed
-from solders.pubkey import Pubkey  # type: ignore
-from solders.transaction import Transaction  # type: ignore
+from solana.transaction import Transaction
+from solders.pubkey import Pubkey as PublicKey  # type: ignore
+from solders.system_program import TransferParams, transfer
 from spl.token.async_client import AsyncToken
-from spl.token.constants import TOKEN_PROGRAM_ID
-from spl.token.instructions import (get_associated_token_address,
-                                    transfer_checked)
 
 from agentipy.agent import SolanaAgentKit
-from agentipy.constants import LAMPORTS_PER_SOL
-from agentipy.types import TransferResult
 
-logger = logging.getLogger(__name__)
-
-class SolanaTransferHelper:
-    """Helper class for Solana token and SOL transfers."""
-
-    @staticmethod
-    async def transfer_native_sol(agent: SolanaAgentKit, to: Pubkey, amount: float) -> str:
-        """
-        Transfer native SOL.
-
-        Args:
-            agent: SolanaAgentKit instance
-            to: Recipient's public key
-            amount: Amount of SOL to transfer
-
-        Returns:
-            Transaction signature.
-        """
-        transaction = Transaction()
-        transaction.add(
-            Transaction(
-                from_pubkey=agent.wallet_address,
-                to_pubkey=to,
-                lamports=int(amount * LAMPORTS_PER_SOL)
-            )
-        )
-
-        result = await agent.connection.send_transaction(
-            transaction,
-            [agent.wallet],
-            opts={
-                "skip_preflight": False,
-                "preflight_commitment": Confirmed,
-                "max_retries": 3
-            }
-        )
-
-        return result.value.signature
-
-    @staticmethod
-    async def transfer_spl_tokens(
-        rpc_client: AsyncClient,
-        agent:SolanaAgentKit,
-        recipient: Pubkey,
-        spl_token: Pubkey,
-        amount: float,
-    ) -> str:
-        """
-        Transfer SPL tokens from payer to recipient.
-
-        Args:
-            rpc_client: Async RPC client instance.
-            payer: Payer's public key (wallet address).
-            recipient: Recipient's public key.
-            spl_token: SPL token mint address.
-            amount: Amount of tokens to transfer.
-
-        Returns:
-            Transaction signature.
-        """
-        
-        spl_client = AsyncToken(rpc_client, spl_token, TOKEN_PROGRAM_ID, agent.wallet_address)
-        
-        mint = await spl_client.get_mint_info()
-        if not mint.is_initialized:
-            raise ValueError("Token mint is not initialized.")
-
-        token_decimals = mint.decimals
-        if amount < 10 ** -token_decimals:
-            raise ValueError("Invalid amount of decimals for the token.")
-
-        tokens = math.floor(amount * (10 ** token_decimals))
-
-        payer_ata = get_associated_token_address(agent.wallet_address, spl_token)
-        recipient_ata = get_associated_token_address(recipient, spl_token)
-
-        payer_account_info = await spl_client.get_account_info(payer_ata)
-        if not payer_account_info.is_initialized:
-            raise ValueError("Payer's associated token account is not initialized.")
-        if tokens > payer_account_info.amount:
-            raise ValueError("Insufficient funds in payer's token account.")
-
-        recipient_account_info = await spl_client.get_account_info(recipient_ata)
-        if not recipient_account_info.is_initialized:
-            raise ValueError("Recipient's associated token account is not initialized.")
-
-        transfer_instruction = transfer_checked(
-            amount=tokens,
-            decimals=token_decimals,
-            program_id=TOKEN_PROGRAM_ID,
-            owner=agent.wallet_address,
-            source=payer_ata,
-            dest=recipient_ata,
-            mint=spl_token,
-        )
-
-        transaction = Transaction().add(transfer_instruction)
-        response = await rpc_client.send_transaction(transaction,
-        [agent.wallet],
-        opts={
-            "skip_preflight": False,
-            "preflight_commitment": Confirmed,
-            "max_retries": 3
-        })
-
-        return response["result"]
-
-    @staticmethod
-    async def confirm_transaction(agent: SolanaAgentKit, signature: str) -> None:
-        """Wait for transaction confirmation."""
-        await agent.connection.confirm_transaction(signature, commitment=Confirmed)
+LAMPORTS_PER_SOL = 10**9
 
 class TokenTransferManager:
-    """Manages token and SOL transfers."""
+    @staticmethod
 
-    def __init__(self, agent: SolanaAgentKit):
-        self.agent = agent
-        self.transfer_history: list[TransferResult] = []
-
-    async def execute_transfer(self, to: Pubkey, amount: float, mint: Optional[Pubkey] = None) -> TransferResult:
+    async def transfer(agent:SolanaAgentKit, to: str, amount: float, mint: str = None) -> str:
         """
-        Execute a token or SOL transfer.
+        Transfer SOL or SPL tokens to a recipient.
 
-        Args:
-            to: Recipient's public key
-            amount: Amount to transfer
-            mint: Token mint address (None for SOL transfers)
-
-        Returns:
-            TransferResult containing transfer details.
+        :param agent: An instance of SolanaAgentKit
+        :param to: Recipient's public key
+        :param amount: Amount to transfer
+        :param mint: Optional mint address for SPL tokens
+        :return: Transaction signature
         """
         try:
-            if mint:
-                signature = await SolanaTransferHelper.transfer_spl_tokens(self.agent, to, amount, mint)
-                token_identifier = str(mint)
+            # Convert to PublicKey objects
+            to_pubkey = PublicKey.from_string(to)
+            wallet_pubkey = agent.wallet_address
+
+            if mint is None:
+                # Transfer native SOL
+                transaction = Transaction()
+                transaction.add(
+                    transfer(
+                        TransferParams(
+                            from_pubkey=wallet_pubkey,
+                            to_pubkey=to_pubkey,
+                            lamports=int(amount * LAMPORTS_PER_SOL),
+                        )
+                    )
+                )
             else:
-                signature = await SolanaTransferHelper.transfer_native_sol(self.agent, to, amount)
-                token_identifier = "SOL"
+                mint_pubkey = PublicKey.from_string(mint)
+                async with AsyncClient(agent.rpc_url) as client:
+                    token = AsyncToken(client, mint_pubkey)
+                    
+                    from_ata = await token.get_associated_token_address(wallet_pubkey)
+                    to_ata = await token.get_associated_token_address(to_pubkey)
 
-            await SolanaTransferHelper.confirm_transaction(self.agent, signature)
+                    mint_info = await token.get_mint_info()
+                    adjusted_amount = int(amount * (10**mint_info.decimals))
 
-            result = TransferResult(
-                signature=signature,
-                from_address=str(self.agent.wallet_address),
-                to_address=str(to),
-                amount=amount,
-                token=token_identifier
-            )
+                    transaction = Transaction()
+                    transaction.add(
+                        token.transfer_checked(
+                            from_ata,
+                            to_ata,
+                            wallet_pubkey,
+                            adjusted_amount,
+                            mint_info.decimals,
+                        )
+                    )
+            blockhash_response = await agent.connection.get_latest_blockhash()
+            recent_blockhash = blockhash_response.value.blockhash
+            transaction.recent_blockhash = recent_blockhash
+            transaction.sign(agent.wallet)
 
-            self.transfer_history.append(result)
-            return result
-
-        except Exception as error:
-            logger.error(f"Transfer failed: {error}")
-            raise RuntimeError(f"Transfer operation failed: {error}") from error
-
-    async def verify_transfer(self, transfer_result: TransferResult) -> bool:
-        """
-        Verify that a transfer was successful.
-
-        Args:
-            transfer_result: TransferResult to verify
-
-        Returns:
-            True if the transfer succeeded, False otherwise.
-        """
-        try:
-            transaction_info = await self.agent.connection.get_transaction(
-                transfer_result.signature,
-                commitment=Confirmed
-            )
-            return transaction_info.value.meta.err is None
-        except Exception as error:
-            logger.warning(f"Failed to verify transfer: {error}")
-            return False
-
-    def get_transfer_history(self) -> list[TransferResult]:
-        """Retrieve the history of all executed transfers."""
-        return self.transfer_history.copy()
+            signature = await agent.connection.send_raw_transaction(transaction.serialize())
+            return signature
+        except Exception as e:
+            raise RuntimeError(f"Transfer failed: {str(e)}")

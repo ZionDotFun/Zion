@@ -17,9 +17,7 @@ class SolanaBalanceTool(BaseTool):
     If you want to get the balance of your wallet, you don't need to provide the tokenAddress.
     If no tokenAddress is provided, the balance will be in SOL.
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -36,6 +34,13 @@ class SolanaBalanceTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaTransferTool(BaseTool):
     name:str = "solana_transfer"
@@ -49,9 +54,7 @@ class SolanaTransferTool(BaseTool):
         "mint": "mint_address" (optional)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -75,6 +78,11 @@ class SolanaTransferTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaDeployTokenTool(BaseTool):
     name:str = "solana_deploy_token"
@@ -85,9 +93,7 @@ class SolanaDeployTokenTool(BaseTool):
         "initialSupply": 1000
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -110,6 +116,13 @@ class SolanaDeployTokenTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
 
 class SolanaTradeTool(BaseTool):
     name:str = "solana_trade"
@@ -124,9 +137,7 @@ class SolanaTradeTool(BaseTool):
         "slippage_bps": 100 (optional)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -150,13 +161,17 @@ class SolanaTradeTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaFaucetTool(BaseTool):
     name:str = "solana_request_funds"
     description:str = "Request test funds from a Solana faucet."
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -173,12 +188,16 @@ class SolanaFaucetTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
 class SolanaStakeTool(BaseTool):
     name:str = "solana_stake"
     description:str = "Stake assets on Solana. Input is the amount to stake."
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -195,13 +214,17 @@ class SolanaStakeTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaGetWalletAddressTool(BaseTool):
     name:str = "solana_get_wallet_address"
     description:str = "Get the wallet address of the agent"
-
-    def __init__(self, solana_kit:SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
     
     async def _arun(self):
         try:
@@ -217,6 +240,12 @@ class SolanaGetWalletAddressTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaCreateImageTool(BaseTool):
     name: str = "solana_create_image"
@@ -230,9 +259,7 @@ class SolanaCreateImageTool(BaseTool):
         "n": "number_of_images" (optional, default: 1)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -257,13 +284,17 @@ class SolanaCreateImageTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR")
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaTPSCalculatorTool(BaseTool):
     name: str = "solana_get_tps"
     description: str = "Get the current TPS of the Solana network."
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self):
         try:
@@ -279,6 +310,13 @@ class SolanaTPSCalculatorTool(BaseTool):
                 "message": f"Error fetching TPS: {str(e)}",
                 "code": getattr(e, "code", "UNKNOWN_ERROR")
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+    
 class SolanaPumpFunTokenTool(BaseTool):
     name:str = "solana_launch_pump_fun_token"
     description:str = """
@@ -292,9 +330,7 @@ class SolanaPumpFunTokenTool(BaseTool):
         "image_url": "http://example.com/image.png"
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -317,6 +353,12 @@ class SolanaPumpFunTokenTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaFetchPriceTool(BaseTool):
     """
@@ -328,9 +370,7 @@ class SolanaFetchPriceTool(BaseTool):
     Inputs:
     - tokenId: string, the mint address of the token, e.g., "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
     """
-
-    def __init__(self, solana_kit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def call(self, input: str) -> str:
         try:
@@ -347,6 +387,12 @@ class SolanaFetchPriceTool(BaseTool):
                 "message": str(error),
                 "code": getattr(error, "code", "UNKNOWN_ERROR"),
             })
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaTokenDataTool(BaseTool):
     """
@@ -358,9 +404,7 @@ class SolanaTokenDataTool(BaseTool):
     Inputs:
     - mintAddress: string, e.g., "So11111111111111111111111111111111111111112" (required)
     """
-
-    def __init__(self, solana_kit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def call(self, input: str) -> str:
         try:
@@ -376,6 +420,12 @@ class SolanaTokenDataTool(BaseTool):
                 "message": str(error),
                 "code": getattr(error, "code", "UNKNOWN_ERROR"),
             })
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaTokenDataByTickerTool(BaseTool):
     """
@@ -387,9 +437,7 @@ class SolanaTokenDataByTickerTool(BaseTool):
     Inputs:
     - ticker: string, e.g., "USDC" (required)
     """
-
-    def __init__(self, solana_kit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def call(self, input: str) -> str:
         try:
@@ -405,6 +453,12 @@ class SolanaTokenDataByTickerTool(BaseTool):
                 "message": str(error),
                 "code": getattr(error, "code", "UNKNOWN_ERROR"),
             })
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaMeteoraDLMMTool(BaseTool):
     """
@@ -427,9 +481,7 @@ class SolanaMeteoraDLMMTool(BaseTool):
         "activation_point": null      // Optional, only for Delayed type
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str) -> dict:
         try:
@@ -485,6 +537,12 @@ class SolanaMeteoraDLMMTool(BaseTool):
                 "message": f"Failed to process input: {input}. Error: {str(e)}",
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaRaydiumBuyTool(BaseTool):
     name: str = "raydium_buy"
@@ -498,9 +556,7 @@ class SolanaRaydiumBuyTool(BaseTool):
         "slippage": 5  # Slippage tolerance in percentage (optional, defaults to 5)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -526,6 +582,12 @@ class SolanaRaydiumBuyTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
 class SolanaRaydiumSellTool(BaseTool):
     name: str = "raydium_sell"
     description: str = """
@@ -538,9 +600,7 @@ class SolanaRaydiumSellTool(BaseTool):
         "slippage": 5  # Slippage tolerance in percentage (optional, defaults to 5)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -565,6 +625,12 @@ class SolanaRaydiumSellTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaBurnAndCloseTool(BaseTool):
     name: str = "solana_burn_and_close_account"
@@ -576,9 +642,7 @@ class SolanaBurnAndCloseTool(BaseTool):
         "token_account": "public_key_of_the_token_account"
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -601,6 +665,12 @@ class SolanaBurnAndCloseTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
+        
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 class SolanaBurnAndCloseMultipleTool(BaseTool):
     name: str = "solana_burn_and_close_multiple_accounts"
@@ -612,9 +682,7 @@ class SolanaBurnAndCloseMultipleTool(BaseTool):
         "token_accounts": ["public_key_1", "public_key_2", ...]
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -637,7 +705,13 @@ class SolanaBurnAndCloseMultipleTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
-        
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+    
 class SolanaCreateGibworkTaskTool(BaseTool):
     name: str = "solana_create_gibwork_task"
     description: str = """
@@ -653,9 +727,7 @@ class SolanaCreateGibworkTaskTool(BaseTool):
         "token_amount": 1000 # amount of token to pay for the task
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -681,6 +753,13 @@ class SolanaCreateGibworkTaskTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+    
 class SolanaCreateGibworkTaskTool(BaseTool):
     name: str = "solana_create_gibwork_task"
     description: str = """
@@ -696,9 +775,7 @@ class SolanaCreateGibworkTaskTool(BaseTool):
         "token_amount": 1000 # amount of token to pay for the task
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -724,6 +801,12 @@ class SolanaCreateGibworkTaskTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+    
 class SolanaBuyUsingMoonshotTool(BaseTool):
     name: str = "solana_buy_using_moonshot"
     description:str = """
@@ -736,9 +819,7 @@ class SolanaBuyUsingMoonshotTool(BaseTool):
         "slippage_bps": 500 # optional, slippage in basis points (default: 500)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -761,6 +842,12 @@ class SolanaBuyUsingMoonshotTool(BaseTool):
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
 
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+    
 class SolanaSellUsingMoonshotTool(BaseTool):
     name: str = "solana_sell_using_moonshot"
     description:str = """
@@ -773,9 +860,7 @@ class SolanaSellUsingMoonshotTool(BaseTool):
         "slippage_bps": 500 # optional, slippage in basis points (default: 500)
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -797,7 +882,13 @@ class SolanaSellUsingMoonshotTool(BaseTool):
                 "message": str(e),
                 "code": getattr(e, "code", "UNKNOWN_ERROR"),
             }
-        
+
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+            
 class SolanaPythGetPriceTool(BaseTool):
     name: str = "solana_pyth_get_price"
     description: str = """
@@ -816,9 +907,7 @@ class SolanaPythGetPriceTool(BaseTool):
         "message": "string, if not trading"
     }
     """
-
-    def __init__(self, solana_kit: SolanaAgentKit):
-        self.solana_kit = solana_kit
+    solana_kit: SolanaAgentKit
 
     async def _arun(self, input: str):
         try:
@@ -836,30 +925,33 @@ class SolanaPythGetPriceTool(BaseTool):
                 "message": str(e),
             }
 
-    def run(self, input: str):
-        raise NotImplementedError("This tool only supports asynchronous operations.")
-
+    def _run(self, input: str):
+        """Synchronous version of the run method, required by BaseTool."""
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
-        SolanaBalanceTool(solana_kit),
-        SolanaTransferTool(solana_kit),
-        SolanaDeployTokenTool(solana_kit),
-        SolanaTradeTool(solana_kit),
-        SolanaFaucetTool(solana_kit),
-        SolanaStakeTool(solana_kit),
-        SolanaPumpFunTokenTool(solana_kit),
-        SolanaCreateImageTool(solana_kit),
-        SolanaGetWalletAddressTool(solana_kit),
-        SolanaTPSCalculatorTool(solana_kit),
-        SolanaFetchPriceTool(solana_kit),
-        SolanaTokenDataTool(solana_kit),
-        SolanaTokenDataByTickerTool(solana_kit),
-        SolanaMeteoraDLMMTool(solana_kit),
-        SolanaRaydiumBuyTool(solana_kit),
-        SolanaRaydiumSellTool(solana_kit),
-        SolanaCreateGibworkTaskTool(solana_kit),
-        SolanaSellUsingMoonshotTool(solana_kit),
-        SolanaBuyUsingMoonshotTool(solana_kit),
-        SolanaPythGetPriceTool(solana_kit)
+        SolanaBalanceTool(solana_kit=solana_kit),
+        SolanaTransferTool(solana_kit=solana_kit),
+        SolanaDeployTokenTool(solana_kit=solana_kit),
+        SolanaTradeTool(solana_kit=solana_kit),
+        SolanaFaucetTool(solana_kit=solana_kit),
+        SolanaStakeTool(solana_kit=solana_kit),
+        SolanaPumpFunTokenTool(solana_kit=solana_kit),
+        SolanaCreateImageTool(solana_kit=solana_kit),
+        SolanaGetWalletAddressTool(solana_kit=solana_kit),
+        SolanaTPSCalculatorTool(solana_kit=solana_kit),
+        SolanaFetchPriceTool(solana_kit=solana_kit),
+        SolanaTokenDataTool(solana_kit=solana_kit),
+        SolanaTokenDataByTickerTool(solana_kit=solana_kit),
+        SolanaMeteoraDLMMTool(solana_kit=solana_kit),
+        SolanaRaydiumBuyTool(solana_kit=solana_kit),
+        SolanaRaydiumSellTool(solana_kit=solana_kit),
+        SolanaCreateGibworkTaskTool(solana_kit=solana_kit),
+        SolanaSellUsingMoonshotTool(solana_kit=solana_kit),
+        SolanaBuyUsingMoonshotTool(solana_kit=solana_kit),
+        SolanaPythGetPriceTool(solana_kit=solana_kit)
     ]
+
