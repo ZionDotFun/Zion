@@ -1,8 +1,10 @@
+import logging
 from typing import List, Optional
 
 from agentipy.agent import SolanaAgentKit
 from agentipy.types import NetworkPerformanceMetrics
 
+logger = logging.getLogger(__name__)
 
 async def fetch_performance_samples(
     agent: SolanaAgentKit, sample_count: int = 1
@@ -106,7 +108,7 @@ class SolanaPerformanceTracker:
             response = await agent.connection.get_recent_performance_samples(1)
 
             performance_samples = response.value
-            print("Performance Samples:", performance_samples)
+            logger.info("Performance Samples:", performance_samples)
 
             if not performance_samples:
                 raise ValueError("No performance samples available.")
