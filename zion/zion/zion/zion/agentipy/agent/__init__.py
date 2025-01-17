@@ -6,7 +6,7 @@ from solders.keypair import Keypair  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
 
 from agentipy.constants import DEFAULT_OPTIONS
-from agentipy.types import PumpfunTokenOptions
+from agentipy.types import BondingCurveState, PumpfunTokenOptions
 from agentipy.utils.meteora_dlmm.types import ActivationType
 
 
@@ -357,3 +357,32 @@ class SolanaAgentKit:
             return RugCheckManager.fetch_token_detailed_report(mint)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_pump_curve_state(conn: AsyncClient, curve_address: Pubkey,):
+        from agentipy.tools.use_pumpfun import PumpfunManager
+        try:
+            return PumpfunManager.get_pump_curve_state(conn, curve_address)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def calculate_pump_curve_price(curve_state:BondingCurveState):
+        from agentipy.tools.use_pumpfun import PumpfunManager
+        try:
+            return PumpfunManager.calculate_pump_curve_price(curve_state)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def buy_token(self, mint:Pubkey, bonding_curve:Pubkey,associated_bonding_curve:Pubkey, amount:float, slippage:float,max_retries:int):
+        from agentipy.tools.use_pumpfun import PumpfunManager
+        try:
+            return PumpfunManager.buy_token(self,mint,bonding_curve,associated_bonding_curve,amount,slippage,max_retries)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+
+    async def sell_token(self, mint:Pubkey, bonding_curve:Pubkey,associated_bonding_curve:Pubkey, amount:float, slippage:float,max_retries:int):
+        from agentipy.tools.use_pumpfun import PumpfunManager
+        try:
+            return PumpfunManager.sell_token(self, mint, bonding_curve, associated_bonding_curve, slippage, max_retries)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+

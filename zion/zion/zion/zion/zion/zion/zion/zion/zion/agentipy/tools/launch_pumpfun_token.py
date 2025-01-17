@@ -1,10 +1,17 @@
+import json
 import logging
 from typing import Any, Dict, Optional
 
 import aiohttp
+import requests
 from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Confirmed
+from solana.rpc.types import TxOpts
+from solders.commitment_config import CommitmentLevel  # type: ignore
 from solders.keypair import Keypair  # type: ignore
+from solders.message import to_bytes_versioned  # type: ignore
+from solders.rpc.config import RpcSendTransactionConfig  # type: ignore
+from solders.rpc.requests import SendVersionedTransaction  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
@@ -84,7 +91,7 @@ class PumpfunTokenManager:
         mint_keypair: Keypair,
         metadata_response: Dict[str, Any],
         options: Optional[PumpfunTokenOptions] = None
-    ) -> bytes:
+    ) -> VersionedTransaction:
         """
         Creates a token transaction via the Pump.fun API.
 
@@ -117,13 +124,22 @@ class PumpfunTokenManager:
         }
 
         logger.debug("Requesting token transaction from Pump.fun...")
-        async with session.post("https://pumpportal.fun/api/trade-local", json=payload) as response:
-            if response.status != 200:
-                error_text = await response.text()
-                raise RuntimeError(f"Transaction creation failed (status {response.status}): {error_text}")
+        response = requests.post(
+                "https://pumpportal.fun/api/trade-local",
+                headers={"Content-Type": "application/json"},
+                data=json.dumps(payload)
+            )
 
-            tx_data = await response.read()
-            return tx_data
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"Transaction creation failed (status {response.status_code}): {response.text}"
+            )
+
+        tx_data = response.content
+
+        tx = VersionedTransaction.from_bytes(tx_data)
+        logger.debug(f"Transaction successfully created: {tx}")
+        return tx
 
     @staticmethod
     async def launch_pumpfun_token(
@@ -174,15 +190,30 @@ class PumpfunTokenManager:
                     metadata_response,
                     options
                 )
-                logger.debug("Deserializing transaction...")
-                tx = VersionedTransaction.deserialize(tx_data)
+                logger.debug(f"Deserializing transaction...")
+                tx = VersionedTransaction(tx_data.message, [mint_keypair, agent.wallet])
 
-            logger.info("Signing and sending transaction to the Solana network...")
-            signature = await sign_and_send_transaction(agent, tx, mint_keypair)
 
-            logger.info("Token launch successful!")
+            lcommitment = CommitmentLevel.Confirmed
+            config = RpcSendTransactionConfig(preflight_commitment=lcommitment)
+            txPayload = SendVersionedTransaction(tx, config)
+
+
+            logger.info("Sending transaction to Solana network...")
+
+            response = requests.post(
+            url= agent.rpc_url,
+            headers={"Content-Type": "application/json"},
+            data=SendVersionedTransaction(tx, config).to_json()
+            )
+
+            print(f"response: {response.json()}")
+
+            txSignature = response.json()['result']
+
+            logger.info(f'Transaction: https://solscan.io/tx/{txSignature}')
             return TokenLaunchResult(
-                signature=signature,
+                signature=txSignature,
                 mint=str(mint_keypair.pubkey()),
                 metadata_uri=metadata_response["metadataUri"]
             )

@@ -1,3 +1,4 @@
+import logging
 import struct
 
 from solana.rpc.api import Client
@@ -20,7 +21,7 @@ from agentipy.utils.moonshot.curve import (TradeDirection,
                                            get_tokens_by_collateral_amount)
 from agentipy.utils.moonshot.utils import confirm_txn, get_token_balance
 
-
+logger = logging.getLogger(__name__)
 class MoonshotManager:
     @staticmethod
     def buy(agent:SolanaAgentKit, mint_str: str, collateral_amount: float = 0.01, slippage_bps: int = 500):
@@ -30,10 +31,10 @@ class MoonshotManager:
             
             collateral_amount = int(collateral_amount * LAMPORTS_PER_SOL)
 
-            print(f"Collateral Amount (in lamports): {collateral_amount}, Amount: {amount}, Slippage (bps): {slippage_bps}")
+            logger.info(f"Collateral Amount (in lamports): {collateral_amount}, Amount: {amount}, Slippage (bps): {slippage_bps}")
             
             if not amount:
-                print("Failed to get tokens by collateral amount...")
+                logger.error("Failed to get tokens by collateral amount...", exc_info=True)
                 return
 
             SENDER = agent.wallet_address
@@ -97,12 +98,12 @@ class MoonshotManager:
             transaction = VersionedTransaction(compiled_message, [agent.wallet])
             
             txn_sig = client.send_transaction(transaction, opts=TxOpts(skip_preflight=True, preflight_commitment="confirmed")).value
-            print(f"Transaction Signature: {txn_sig}")
+            logger.info(f"Transaction Signature: {txn_sig}")
             
             confirm = confirm_txn(txn_sig)
-            print(f"Transaction Confirmation: {confirm}")
+            logger.info(f"Transaction Confirmation: {confirm}")
         except Exception as e:
-            print(e)
+            logger.error(e, exc_info=True)
     
     @staticmethod 
     def sell(agent:SolanaAgentKit, mint_str: str, token_balance: float=None, slippage_bps: int=500):
@@ -111,7 +112,7 @@ class MoonshotManager:
             if token_balance is None:
                 token_balance = get_token_balance(PUB_KEY, mint_str)
             
-            print(f"Token Balance: {token_balance}")
+            logger.info(f"Token Balance: {token_balance}")
             
             if token_balance == 0:
                 return
@@ -119,7 +120,7 @@ class MoonshotManager:
             collateral_amount = get_collateral_amount_by_tokens(mint_str, token_balance, TradeDirection.SELL)
             amount = int(token_balance * LAMPORTS_PER_SOL)
             
-            print(f"Collateral Amount: {collateral_amount}, Amount (in lamports): {amount}, Slippage (bps): {slippage_bps}")
+            logger.info(f"Collateral Amount: {collateral_amount}, Amount (in lamports): {amount}, Slippage (bps): {slippage_bps}")
             
             MINT = Pubkey.from_string(mint_str)
             CURVE_ACCOUNT, CURVE_TOKEN_ACCOUNT = derive_curve_accounts(MINT)
@@ -168,9 +169,9 @@ class MoonshotManager:
             transaction = VersionedTransaction(compiled_message, [agent.wallet])
             
             txn_sig = client.send_transaction(transaction, opts=TxOpts(skip_preflight=True, preflight_commitment="confirmed")).value
-            print(f"Transaction Signature: {txn_sig}")
+            logger.info(f"Transaction Signature: {txn_sig}")
 
             confirm = confirm_txn(txn_sig)
-            print(f"Transaction Confirmation: {confirm}")
+            logger.info(f"Transaction Confirmation: {confirm}")
         except Exception as e:
-            print(e)
+            logger.error(e, exc_info=True)
