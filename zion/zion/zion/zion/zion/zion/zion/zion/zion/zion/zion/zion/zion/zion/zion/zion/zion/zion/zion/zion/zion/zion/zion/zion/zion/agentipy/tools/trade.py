@@ -8,7 +8,9 @@ from solders.transaction import VersionedTransaction  # type: ignore
 from agentipy.agent import SolanaAgentKit
 from agentipy.constants import (DEFAULT_OPTIONS, JUP_API, LAMPORTS_PER_SOL,
                                 TOKENS)
+from agentipy.helpers import fix_asyncio_for_windows
 
+fix_asyncio_for_windows()
 
 class TradeManager:
     @staticmethod

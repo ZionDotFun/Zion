@@ -1,3 +1,5 @@
+import logging
+
 from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Confirmed
 from solana.rpc.core import RPCException
@@ -7,6 +9,7 @@ from solders.pubkey import Pubkey  # type: ignore
 from agentipy.agent import SolanaAgentKit
 from agentipy.constants import LAMPORTS_PER_SOL
 
+logger = logging.getLogger(__name__)
 
 class FaucetManager:
     @staticmethod
@@ -24,7 +27,7 @@ class FaucetManager:
             Exception: If the request fails or times out.
         """
         try:
-            print(f"Requesting faucet for wallet: {repr(agent.wallet_address)}")
+            logger.info(f"Requesting faucet for wallet: {repr(agent.wallet_address)}")
 
             response = await agent.connection.request_airdrop(
                 agent.wallet_address, 5 * LAMPORTS_PER_SOL
@@ -39,7 +42,7 @@ class FaucetManager:
                 last_valid_block_height=latest_blockhash.value.last_valid_block_height
             )
 
-            print(f"Airdrop successful, transaction signature: {tx_signature}")
+            logger.error(f"Airdrop successful, transaction signature: {tx_signature}", exc_info=True)
             return tx_signature
         except KeyError:
             raise Exception("Airdrop response did not contain a transaction signature.")
