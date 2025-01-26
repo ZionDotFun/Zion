@@ -1,5 +1,8 @@
 import aiohttp
 
+from agentipy.helpers import fix_asyncio_for_windows
+
+fix_asyncio_for_windows()
 
 class TokenPriceFetcher:
     @staticmethod
