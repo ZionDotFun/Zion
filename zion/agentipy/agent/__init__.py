@@ -456,3 +456,39 @@ class SolanaAgentKit:
             return DeployCollectionManager.mint_metaplex_core_nft(self, collectionMint, name, uri, sellerFeeBasisPoints, address, share, recipient)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def create_debridge_transaction(
+    self,
+    src_chain_id: str,
+    src_chain_token_in: str,
+    src_chain_token_in_amount: str,
+    dst_chain_id: str,
+    dst_chain_token_out: str,
+    dst_chain_token_out_recipient: str,
+    src_chain_order_authority_address: str,
+    dst_chain_order_authority_address: str,
+    affiliate_fee_percent: str = "0",
+    affiliate_fee_recipient: str = "",
+    prepend_operating_expenses: bool = True,
+    dst_chain_token_out_amount: str = "auto"):
+        from agentipy.tools.use_debridge import DeBridgeManager   
+        try:
+            return DeBridgeManager.create_debridge_transaction(self, src_chain_id, src_chain_token_in, src_chain_token_in_amount, dst_chain_id, dst_chain_token_out, dst_chain_token_out_recipient, src_chain_order_authority_address, dst_chain_order_authority_address, affiliate_fee_percent, affiliate_fee_recipient, prepend_operating_expenses, dst_chain_token_out_amount)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def execute_debridge_transaction(self, transaction_data: dict):
+        from agentipy.tools.use_debridge import DeBridgeManager   
+        try:
+            return DeBridgeManager.execute_debridge_transaction(self, transaction_data)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def check_transaction_status(self, tx_hash: str):
+        from agentipy.tools.use_debridge import DeBridgeManager   
+        try:
+            return DeBridgeManager.check_transaction_status(self, tx_hash)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+        

@@ -2,6 +2,8 @@ import base64
 
 import aiohttp
 from solana.rpc.commitment import Confirmed
+from solana.rpc.types import TxOpts
+from solders.message import to_bytes_versioned  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
@@ -72,21 +74,24 @@ class TradeManager:
             transaction = VersionedTransaction.from_bytes(swap_transaction_buf)
 
             latest_blockhash = await agent.connection.get_latest_blockhash()
-            transaction.message.recent_blockhash = latest_blockhash.value.blockhash
 
-            transaction.sign(agent.wallet)
+            signature = agent.wallet.sign_message(to_bytes_versioned(transaction.message))
+            signed_transaction = VersionedTransaction.populate(transaction.message, [signature])
 
-            signature = await agent.connection.send_raw_transaction(
-                transaction.serialize(), opts={"skip_preflight": False, "max_retries": 3}
+            tx_resp = await agent.connection.send_transaction(
+                signed_transaction,
+                opts=TxOpts(preflight_commitment=Confirmed, skip_preflight=False, max_retries=3),
             )
+            tx_id = tx_resp.value
 
             await agent.connection.confirm_transaction(
-                signature,
+                tx_id,
                 commitment=Confirmed,
                 last_valid_block_height=latest_blockhash.value.last_valid_block_height,
             )
 
             return str(signature)
+
 
         except Exception as e:
             raise Exception(f"Swap failed: {str(e)}")

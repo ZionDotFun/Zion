@@ -9,11 +9,13 @@ from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
 from agentipy.constants import DEFAULT_OPTIONS
+from agentipy.helpers import fix_asyncio_for_windows
 from agentipy.types import PumpfunTokenOptions, TokenLaunchResult
 from agentipy.utils.send_tx import sign_and_send_transaction
 
 logger = logging.getLogger(__name__)
 
+fix_asyncio_for_windows()
 
 class PumpfunTokenManager:
     @staticmethod
