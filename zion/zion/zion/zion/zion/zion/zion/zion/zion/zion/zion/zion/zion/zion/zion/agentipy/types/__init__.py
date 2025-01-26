@@ -1,5 +1,7 @@
-from typing import List, Optional
 
+from typing import Dict, List, Optional
+
+from construct import Flag, Int64ul, Struct
 from pydantic import BaseModel
 from solders.pubkey import Pubkey  # type: ignore
 
@@ -8,6 +10,12 @@ class BaseModelWithArbitraryTypes(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
+class TokenCheck(BaseModelWithArbitraryTypes):
+    token_program:str
+    token_type: str
+    risks: List[Dict]
+    score: int
+    
 class Creator(BaseModelWithArbitraryTypes):
     address: str
     percentage: int
@@ -83,7 +91,13 @@ class JupiterTokenData(BaseModelWithArbitraryTypes):
     symbol:str
     name:str
 
-class GibworkCreateTaskResponse:
+class GibworkCreateTaskResponse(BaseModelWithArbitraryTypes):
     status: str
     taskId: Optional[str] = None
     signature: Optional[str] = None
+
+class TokenCheck(BaseModelWithArbitraryTypes):
+    token_program:str
+    token_type: str
+    risks: List[Dict]
+    score: int
