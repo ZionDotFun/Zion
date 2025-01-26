@@ -1,3 +1,5 @@
+import logging
+
 from solana.rpc.api import Client
 from solana.rpc.types import TxOpts
 from solana.transaction import Transaction
@@ -10,10 +12,12 @@ from spl.token.instructions import (BurnParams, CloseAccountParams, burn,
 
 from agentipy.agent import SolanaAgentKit
 
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 class BurnManager:
     @staticmethod
-    def burn_and_close_account(agent:SolanaAgentKit, token_account: str):
+    def burn_and_close_account(agent: SolanaAgentKit, token_account: str):
         """
         Burns tokens and closes the given token account.
 
@@ -22,13 +26,12 @@ class BurnManager:
         token_account (str): The public key of the token account to process.
         """
         token_account_pubkey = Pubkey.from_string(token_account)
-
         try:
             client = Client(agent.rpc_url)
             token_balance = int(client.get_token_account_balance(token_account_pubkey).value.amount)
-            print(f"Token Balance for {token_account}: {token_balance}")
+            logger.info(f"Token balance for {token_account}: {token_balance}")
         except Exception as e:
-            print(f"Error fetching token balance for {token_account}: {e}")
+            logger.error(f"Error fetching token balance for {token_account}: {e}", exc_info=True)
             return
 
         owner = agent.wallet.pubkey()
@@ -52,8 +55,9 @@ class BurnManager:
                     )
                 )
                 transaction.add(burn_instruction)
+                logger.info(f"Prepared burn instruction for {token_account}")
             except Exception as e:
-                print(f"Error preparing burn instruction for {token_account}: {e}")
+                logger.error(f"Error preparing burn instruction for {token_account}: {e}", exc_info=True)
                 return
 
         close_account_instruction = close_account(
@@ -71,12 +75,12 @@ class BurnManager:
         try:
             transaction.sign(agent.wallet)
             txn_sig = client.send_transaction(transaction, agent.wallet, opts=TxOpts(skip_preflight=True)).value
-            print(f"Transaction Signature for {token_account}: {txn_sig}")
+            logger.info(f"Transaction signature for {token_account}: {txn_sig}")
         except Exception as e:
-            print(f"Error sending transaction for {token_account}: {e}")
+            logger.error(f"Error sending transaction for {token_account}: {e}", exc_info=True)
 
     @staticmethod
-    def process_multiple_accounts(agent, token_accounts):
+    def process_multiple_accounts(agent: SolanaAgentKit, token_accounts: list):
         """
         Processes multiple token accounts by burning and closing each one.
 
@@ -86,6 +90,7 @@ class BurnManager:
         """
         for token_account in token_accounts:
             try:
+                logger.info(f"Processing token account: {token_account}")
                 BurnManager.burn_and_close_account(agent, token_account)
             except Exception as e:
-                print(f"Error processing token account {token_account}: {e}")
+                logger.error(f"Error processing token account {token_account}: {e}", exc_info=True)
