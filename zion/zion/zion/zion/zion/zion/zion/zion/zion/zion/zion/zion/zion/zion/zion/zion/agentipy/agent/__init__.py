@@ -33,7 +33,8 @@ class SolanaAgentKit:
         rpc_url: Optional[str] = None,
         openai_api_key: Optional[str] = None,
         helius_api_key: Optional[str] = None,
-        helius_rpc_url: Optional[str] = None
+        helius_rpc_url: Optional[str] = None,
+        quicknode_rpc_url: Optional[str] = None
     ):
         self.rpc_url = rpc_url or os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
         self.wallet = Keypair.from_base58_string(private_key or os.getenv("SOLANA_PRIVATE_KEY", ""))
@@ -41,6 +42,7 @@ class SolanaAgentKit:
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY", "")
         self.helius_api_key = helius_api_key or os.getenv("HELIUS_API_KEY", "")
         self.helius_rpc_url = helius_rpc_url or os.getenv("HELIUS_RPC_URL", "")
+        self.quicknode_rpc_url = quicknode_rpc_url or os.getenv("QUICKNODE_RPC_URL", "")
 
         self.connection = AsyncClient(self.rpc_url)
 
@@ -386,3 +388,31 @@ class SolanaAgentKit:
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
 
+    async def resolve_name_to_address(self, domain: str):
+        from agentipy.tools.use_sns import NameServiceManager
+        try:
+            return NameServiceManager.resolve_name_to_address(self, domain)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_favourite_domain(self, owner: str):
+        from agentipy.tools.use_sns import NameServiceManager
+        try:
+            return NameServiceManager.get_favourite_domain(self, owner)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_all_domains_for_owner(self, owner: str):
+        from agentipy.tools.use_sns import NameServiceManager
+        try:
+            return NameServiceManager.get_all_domains_for_owner(self, owner)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_registration_transaction(self, domain: str, buyer: str, buyer_token_account: str, space: int, 
+                                     mint: Optional[str] = None, referrer_key: Optional[str] = None):
+        from agentipy.tools.use_sns import NameServiceManager
+        try:
+            return NameServiceManager.get_registration_transaction(self, domain, buyer, buyer_token_account, space, mint, referrer_key)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
