@@ -101,3 +101,16 @@ class TokenCheck(BaseModelWithArbitraryTypes):
     token_type: str
     risks: List[Dict]
     score: int
+
+class BondingCurveState:
+    _STRUCT = Struct(
+        "virtual_token_reserves" / Int64ul,
+        "virtual_sol_reserves" / Int64ul,
+        "real_token_reserves" / Int64ul,
+        "real_sol_reserves" / Int64ul,
+        "token_total_supply" / Int64ul,
+        "complete" / Flag
+    )
+    def __init__(self, data: bytes) -> None:
+        parsed = self._STRUCT.parse(data[8:])
+        self.__dict__.update(parsed)
