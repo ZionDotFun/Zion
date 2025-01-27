@@ -2451,6 +2451,63 @@ class SolanaDeBridgeCheckTransactionStatusTool(BaseTool):
             "This tool only supports async execution via _arun. Please use the async interface."
         )
     
+class SolanaCybersCreateCoinTool(BaseTool):
+    name: str = "cybers_create_coin"
+    description: str = """
+    Creates a new coin using the CybersManager.
+
+    Input: A JSON string with:
+    {
+        "name": "string, the name of the coin",
+        "symbol": "string, the symbol of the coin",
+        "image_path": "string, the file path to the coin's image",
+        "tweet_author_id": "string, the Twitter ID of the coin's author",
+        "tweet_author_username": "string, the Twitter username of the coin's author"
+    }
+
+    Output:
+    {
+        "coin_id": "string, the unique ID of the created coin",
+        "message": "string, if an error occurs"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            name = data["name"]
+            symbol = data["symbol"]
+            image_path = data["image_path"]
+            tweet_author_id = data["tweet_author_id"]
+            tweet_author_username = data["tweet_author_username"]
+
+            if not all([name, symbol, image_path, tweet_author_id, tweet_author_username]):
+                raise ValueError("All fields (name, symbol, image_path, tweet_author_id, tweet_author_username) are required.")
+
+            coin_id = await self.solana_kit.cybers_create_coin(
+                name=name,
+                symbol=symbol,
+                image_path=image_path,
+                tweet_author_id=tweet_author_id,
+                tweet_author_username=tweet_author_username
+            )
+            return {
+                "coin_id": coin_id,
+                "message": "Success"
+            }
+        except Exception as e:
+            return {
+                "coin_id": None,
+                "message": f"Error creating coin: {str(e)}"
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit=solana_kit),
@@ -2506,5 +2563,6 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaDeBridgeCreateTransactionTool(solana_kit=solana_kit),
         SolanaDeBridgeCheckTransactionStatusTool(solana_kit=solana_kit),
         SolanaDeBridgeExecuteTransactionTool(solana_kit=solana_kit),
+        SolanaCybersCreateCoinTool(solana_kit=solana_kit),
     ]
 

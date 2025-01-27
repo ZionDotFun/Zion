@@ -1703,7 +1703,196 @@ class SolanaFetchTokenDetailedReportTool(BaseTool):
         raise NotImplementedError(
             "This tool only supports async execution via _arun. Please use the async interface."
         )
-    
+
+class SolanaGetPumpCurveStateTool(BaseTool):
+    name: str = "solana_get_pump_curve_state"
+    description: str = """
+    Get the pump curve state for a specific bonding curve.
+
+    Input: A JSON string with:
+    {
+        "conn": "AsyncClient instance or connection object",
+        "curve_address": "The public key of the bonding curve as a string"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "data": <PumpCurveState object as a dictionary>
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            conn = data.get("conn")
+            curve_address = data.get("curve_address")
+            if not conn or not curve_address:
+                raise ValueError("Missing 'conn' or 'curve_address' in input.")
+
+            curve_address_key = Pubkey(curve_address)
+            result = await self.solana_kit.get_pump_curve_state(conn, curve_address_key)
+            return {
+                "status": "success",
+                "data": result.dict(),
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution.")
+
+class SolanaCalculatePumpCurvePriceTool(BaseTool):
+    name: str = "solana_calculate_pump_curve_price"
+    description: str = """
+    Calculate the price for a bonding curve based on its state.
+
+    Input: A JSON string with:
+    {
+        "curve_state": "BondingCurveState object as a dictionary"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "price": "The calculated price"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            curve_state = data.get("curve_state")
+            if not curve_state:
+                raise ValueError("Missing 'curve_state' in input.")
+
+            result = await self.solana_kit.calculate_pump_curve_price(curve_state)
+            return {
+                "status": "success",
+                "price": result,
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution.")
+
+class SolanaBuyTokenTool(BaseTool):
+    name: str = "solana_buy_token"
+    description: str = """
+    Buy a specific amount of tokens using the bonding curve.
+
+    Input: A JSON string with:
+    {
+        "mint": "The mint address of the token as a string",
+        "bonding_curve": "The bonding curve public key as a string",
+        "associated_bonding_curve": "The associated bonding curve public key as a string",
+        "amount": "The amount of tokens to buy",
+        "slippage": "The allowed slippage percentage",
+        "max_retries": "Maximum retries for the transaction"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "transaction": "Details of the successful transaction"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            required_keys = ["mint", "bonding_curve", "associated_bonding_curve", "amount", "slippage", "max_retries"]
+            for key in required_keys:
+                if key not in data:
+                    raise ValueError(f"Missing '{key}' in input.")
+
+            mint = Pubkey(data["mint"])
+            bonding_curve = Pubkey(data["bonding_curve"])
+            associated_bonding_curve = Pubkey(data["associated_bonding_curve"])
+            amount = data["amount"]
+            slippage = data["slippage"]
+            max_retries = data["max_retries"]
+
+            result = await self.solana_kit.buy_token(
+                mint, bonding_curve, associated_bonding_curve, amount, slippage, max_retries
+            )
+            return {
+                "status": "success",
+                "transaction": result.dict(),
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution.")
+
+class SolanaSellTokenTool(BaseTool):
+    name: str = "solana_sell_token"
+    description: str = """
+    Sell a specific amount of tokens using the bonding curve.
+
+    Input: A JSON string with:
+    {
+        "mint": "The mint address of the token as a string",
+        "bonding_curve": "The bonding curve public key as a string",
+        "associated_bonding_curve": "The associated bonding curve public key as a string",
+        "amount": "The amount of tokens to sell",
+        "slippage": "The allowed slippage percentage",
+        "max_retries": "Maximum retries for the transaction"
+    }
+
+    Output:
+    {
+        "status": "success",
+        "transaction": "Details of the successful transaction"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            required_keys = ["mint", "bonding_curve", "associated_bonding_curve", "amount", "slippage", "max_retries"]
+            for key in required_keys:
+                if key not in data:
+                    raise ValueError(f"Missing '{key}' in input.")
+
+            mint = Pubkey(data["mint"])
+            bonding_curve = Pubkey(data["bonding_curve"])
+            associated_bonding_curve = Pubkey(data["associated_bonding_curve"])
+            amount = data["amount"]
+            slippage = data["slippage"]
+            max_retries = data["max_retries"]
+
+            result = await self.solana_kit.sell_token(
+                mint, bonding_curve, associated_bonding_curve, amount, slippage, max_retries
+            )
+            return {
+                "status": "success",
+                "transaction": result.dict(),
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": str(e),
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution.")
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit=solana_kit),
@@ -1742,6 +1931,10 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaHeliusEditWebhookTool(solana_kit=solana_kit),
         SolanaHeliusDeleteWebhookTool(solana_kit=solana_kit),
         SolanaFetchTokenReportSummaryTool(solana_kit=solana_kit),
-        SolanaFetchTokenDetailedReportTool(solana_kit=solana_kit)
+        SolanaFetchTokenDetailedReportTool(solana_kit=solana_kit),
+        SolanaGetPumpCurveStateTool(solana_kit=solana_kit),
+        SolanaCalculatePumpCurvePriceTool(solana_kit=solana_kit),
+        SolanaBuyTokenTool(solana_kit=solana_kit),
+        SolanaSellTokenTool(solana_kit=solana_kit)
     ]
 
