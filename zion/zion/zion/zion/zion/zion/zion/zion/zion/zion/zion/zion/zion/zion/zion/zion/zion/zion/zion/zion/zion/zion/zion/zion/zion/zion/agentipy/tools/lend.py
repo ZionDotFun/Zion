@@ -3,6 +3,8 @@ import json
 
 import aiohttp
 from solana.rpc.commitment import Confirmed
+from solana.rpc.types import TxOpts
+from solders.message import to_bytes_versioned  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
 from agentipy.agent import SolanaAgentKit
@@ -36,19 +38,24 @@ class AssetLender:
                 data = await response.json()
 
             transaction_bytes = base64.b64decode(data["transaction"])
-            lulo_txn = VersionedTransaction.deserialize(transaction_bytes)
+            lulo_txn = VersionedTransaction.from_bytes(transaction_bytes)
 
             latest_blockhash = await agent.connection.get_latest_blockhash()
-            lulo_txn.message.recent_blockhash = latest_blockhash.value.blockhash
 
-            lulo_txn.sign([agent.wallet])
+            signature = agent.wallet.sign_message(to_bytes_versioned(lulo_txn.message))
 
-            signature = await agent.connection.send_transaction(lulo_txn, opts={"preflight_commitment": Confirmed})
-            
+            signed_tx = VersionedTransaction.populate(lulo_txn.message, [signature])
+
+            tx_resp = await agent.connection.send_transaction(
+                signed_tx,
+                opts=TxOpts(preflight_commitment=Confirmed)
+            )          
+            tx_id = tx_resp.value 
+
             await agent.connection.confirm_transaction(
-                tx_sig=signature,
-                last_valid_block_height=latest_blockhash.value.last_valid_block_height,
+                tx_id,
                 commitment=Confirmed,
+                last_valid_block_height=latest_blockhash.value.last_valid_block_height,
             )
 
             return str(signature)
