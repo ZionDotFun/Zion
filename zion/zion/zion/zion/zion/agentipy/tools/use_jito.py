@@ -11,8 +11,9 @@ class JitoManager:
         else:
             return __send_request(agent, endpoint="/bundles?uuid=" + agent.jito_uuid, method="getTipAccounts")
 
-    def get_random_tip_account(self):
-        response = self.get_tip_accounts()
+    @staticmethod
+    def get_random_tip_account():
+        response = JitoManager.get_tip_accounts()
         if not response['success']:
             print(f"Error getting tip accounts: {response.get('error', 'Unknown error')}")
             return None
@@ -73,4 +74,4 @@ class JitoManager:
         if query_params:
             ep += "?" + "&".join(query_params)
 
-        return __send_request(endpoint=ep, method="sendTransaction", params=params)
+        return __send_request(agent, endpoint=ep, method="sendTransaction", params=params)
