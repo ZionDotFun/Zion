@@ -2070,6 +2070,243 @@ class SolanaSNSGetAllDomainsTool(BaseTool):
             "This tool only supports async execution via _arun. Please use the async interface."
         )
 
+class SolanaDeployCollectionTool(BaseTool):
+    name: str = "solana_deploy_collection"
+    description: str = """
+    Deploys an NFT collection using the Metaplex program.
+
+    Input: A JSON string with:
+    {
+        "name": "string, the name of the NFT collection",
+        "uri": "string, the metadata URI",
+        "royalty_basis_points": "int, royalty percentage in basis points (e.g., 500 for 5%)",
+        "creator_address": "string, the creator's public key"
+    }
+
+    Output:
+    {
+        "success": "bool, whether the operation was successful",
+        "value": "string, the transaction signature if successful",
+        "message": "string, additional details or error information"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            name = data["name"]
+            uri = data["uri"]
+            royalty_basis_points = data["royalty_basis_points"]
+            creator_address = data["creator_address"]
+
+            if not all([name, uri, royalty_basis_points, creator_address]):
+                raise ValueError("All input fields are required.")
+
+            result = await self.solana_kit.deploy_collection(
+                name=name,
+                uri=uri,
+                royalty_basis_points=royalty_basis_points,
+                creator_address=creator_address,
+            )
+            return result
+        except Exception as e:
+            return {"success": False, "message": f"Error deploying collection: {str(e)}"}
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+class SolanaGetMetaplexAssetTool(BaseTool):
+    name: str = "solana_get_metaplex_asset"
+    description: str = """
+    Fetches detailed information about a specific Metaplex asset.
+
+    Input: A JSON string with:
+    {
+        "asset_id": "string, the unique identifier of the asset"
+    }
+
+    Output:
+    {
+        "success": "bool, whether the operation was successful",
+        "value": "object, detailed asset information if successful",
+        "message": "string, additional details or error information"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            asset_id = data["asset_id"]
+
+            if not asset_id:
+                raise ValueError("Asset ID is required.")
+
+            result = await self.solana_kit.get_metaplex_asset(asset_id)
+            return result
+        except Exception as e:
+            return {"success": False, "message": f"Error fetching Metaplex asset: {str(e)}"}
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+    
+class SolanaGetMetaplexAssetsByCreatorTool(BaseTool):
+    name: str = "solana_get_metaplex_assets_by_creator"
+    description: str = """
+    Fetches assets created by a specific creator.
+
+    Input: A JSON string with:
+    {
+        "creator": "string, the creator's public key",
+        "only_verified": "bool, fetch only verified assets (default: False)",
+        "sort_by": "string, field to sort by (e.g., 'date')",
+        "sort_direction": "string, 'asc' or 'desc'",
+        "limit": "int, maximum number of assets",
+        "page": "int, page number for paginated results"
+    }
+
+    Output:
+    {
+        "success": "bool, whether the operation was successful",
+        "value": "list, the list of assets if successful",
+        "message": "string, additional details or error information"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            creator = data["creator"]
+            only_verified = data.get("only_verified", False)
+            sort_by = data.get("sort_by")
+            sort_direction = data.get("sort_direction")
+            limit = data.get("limit")
+            page = data.get("page")
+
+            if not creator:
+                raise ValueError("Creator address is required.")
+
+            result = await self.solana_kit.get_metaplex_assets_by_creator(
+                creator=creator,
+                onlyVerified=only_verified,
+                sortBy=sort_by,
+                sortDirection=sort_direction,
+                limit=limit,
+                page=page,
+            )
+            return result
+        except Exception as e:
+            return {"success": False, "message": f"Error fetching assets by creator: {str(e)}"}
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+
+class SolanaGetMetaplexAssetsByAuthorityTool(BaseTool):
+    name: str = "solana_get_metaplex_assets_by_authority"
+    description: str = """
+    Fetches assets created by a specific authority.
+
+    Input: A JSON string with:
+    {
+        "authority": "string, the authority's public key",
+        "sort_by": "string, field to sort by (e.g., 'date')",
+        "sort_direction": "string, 'asc' or 'desc'",
+        "limit": "int, maximum number of assets",
+        "page": "int, page number for paginated results"
+    }
+
+    Output:
+    {
+        "success": "bool, whether the operation was successful",
+        "value": "list, the list of assets if successful",
+        "message": "string, additional details or error information"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            authority = data["authority"]
+            sort_by = data.get("sort_by")
+            sort_direction = data.get("sort_direction")
+            limit = data.get("limit")
+            page = data.get("page")
+
+            if not authority:
+                raise ValueError("Creator address is required.")
+
+            result = await self.solana_kit.get_metaplex_assets_by_authority(
+                authority=authority,
+                sortBy=sort_by,
+                sortDirection=sort_direction,
+                limit=limit,
+                page=page,
+            )
+            return result
+        except Exception as e:
+            return {"success": False, "message": f"Error fetching assets by authority: {str(e)}"}
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
+
+class SolanaMintMetaplexCoreNFTTool(BaseTool):
+    name: str = "solana_mint_metaplex_core_nft"
+    description: str = """
+    Mints an NFT using the Metaplex Core program.
+
+    Input: A JSON string with:
+    {
+        "collection_mint": "string, the collection mint's public key",
+        "name": "string, the name of the NFT",
+        "uri": "string, the metadata URI",
+        "seller_fee_basis_points": "int, royalty in basis points",
+        "address": "string, the creator's public key",
+        "share": "string, share percentage for the creator",
+        "recipient": "string, recipient's public key"
+    }
+
+    Output:
+    {
+        "success": "bool, whether the operation was successful",
+        "transaction": "string, the transaction signature if successful",
+        "message": "string, additional details or error information"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            collection_mint = data["collection_mint"]
+            name = data["name"]
+            uri = data["uri"]
+            seller_fee_basis_points = data.get("seller_fee_basis_points")
+            address = data.get("address")
+            share = data.get("share")
+            recipient = data.get("recipient")
+
+            if not all([collection_mint, name, uri]):
+                raise ValueError("Collection mint, name, and URI are required.")
+
+            result = await self.solana_kit.mint_metaplex_core_nft(
+                collectionMint=collection_mint,
+                name=name,
+                uri=uri,
+                sellerFeeBasisPoints=seller_fee_basis_points,
+                address=address,
+                share=share,
+                recipient=recipient,
+            )
+            return result
+        except Exception as e:
+            return {"success": False, "message": f"Error minting NFT: {str(e)}"}
+
+    def _run(self, input: str):
+        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
 
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
@@ -2117,6 +2354,11 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaSNSGetAllDomainsTool(solana_kit=solana_kit),
         SolanaSNSRegisterDomainTool(solana_kit=solana_kit),
         SolanaSNSGetFavouriteDomainTool(solana_kit=solana_kit),
-        SolanaSNSResolveTool(solana_kit=solana_kit)
+        SolanaSNSResolveTool(solana_kit=solana_kit),
+        SolanaGetMetaplexAssetsByAuthorityTool(solana_kit=solana_kit),
+        SolanaGetMetaplexAssetsByCreatorTool(solana_kit=solana_kit),
+        SolanaGetMetaplexAssetTool(solana_kit=solana_kit),
+        SolanaMintMetaplexCoreNFTTool(solana_kit=solana_kit),
+        SolanaDeployCollectionTool(solana_kit=solana_kit),
     ]
 
