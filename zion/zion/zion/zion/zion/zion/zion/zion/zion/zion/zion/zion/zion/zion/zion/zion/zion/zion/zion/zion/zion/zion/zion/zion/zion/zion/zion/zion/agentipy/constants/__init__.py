@@ -1,3 +1,5 @@
+import struct
+
 from solders.pubkey import Pubkey  # type: ignore
 
 # Common token addresses used across the toolkit
@@ -20,3 +22,17 @@ DEFAULT_OPTIONS = {
 JUP_API = "https://quote-api.jup.ag/v6"
 
 LAMPORTS_PER_SOL = 1_000_000_000
+
+# Pumpfun constants
+EXPECTED_DISCRIMINATOR = struct.pack("<Q", 6966180631402821399)
+TOKEN_DECIMALS = 6
+
+PUMP_PROGRAM = Pubkey.from_string("6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P")
+PUMP_GLOBAL = Pubkey.from_string("4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf")
+PUMP_EVENT_AUTHORITY = Pubkey.from_string("Ce6TQqeHC9p8KetsN6JsjHK7UTZk7nasjjnr7XxXp9F1")
+PUMP_FEE = Pubkey.from_string("CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM")
+PUMP_LIQUIDITY_MIGRATOR = Pubkey.from_string("39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg")
+SYSTEM_PROGRAM = Pubkey.from_string("11111111111111111111111111111111")
+SYSTEM_TOKEN_PROGRAM = Pubkey.from_string("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+SYSTEM_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM = Pubkey.from_string("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+SYSTEM_RENT = Pubkey.from_string("SysvarRent111111111111111111111111111111111")

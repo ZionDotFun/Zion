@@ -298,6 +298,21 @@ files = [
 ]
 
 [[package]]
+name = "backpack-exchange-sdk"
+version = "1.0.24"
+description = "A simple SDK for backpack exchange"
+optional = false
+python-versions = "*"
+files = [
+    {file = "backpack_exchange_sdk-1.0.24-py3-none-any.whl", hash = "sha256:0c28617e3aaa5f1c8c28f9a7bec93d710db0f743d0177be6cf895ef13f9112d6"},
+    {file = "backpack_exchange_sdk-1.0.24.tar.gz", hash = "sha256:7881d2be7012f8139bd576becdeab3f4c0cceda26904387af5cb5c4f494f68fd"},
+]
+
+[package.dependencies]
+cryptography = "*"
+requests = "*"
+
+[[package]]
 name = "base58"
 version = "2.1.1"
 description = "Base58 and Base58Check implementation."
@@ -3616,4 +3631,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.13.0"
-content-hash = "2173ff874fe75fee5572d370c8df41411ff3ca2232136b6e50f0d588715030de"
+content-hash = "a155b9d1bb23aa36fbaa6bcc43a184e74accdf8d1db99af86335d5b713c1c331"
