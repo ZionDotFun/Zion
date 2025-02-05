@@ -1893,6 +1893,184 @@ class SolanaSellTokenTool(BaseTool):
     def _run(self, input: str):
         raise NotImplementedError("This tool only supports async execution.")
 
+class SolanaSNSResolveTool(BaseTool):
+    name: str = "solana_sns_resolve"
+    description: str = """
+    Resolves a Solana Name Service (SNS) domain to its corresponding address.
+
+    Input: A JSON string with:
+    {
+        "domain": "string, the SNS domain (e.g., example.sol)"
+    }
+
+    Output:
+    {
+        "address": "string, the resolved Solana address",
+        "message": "string, if resolution fails"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            domain = data["domain"]
+            if not domain:
+                raise ValueError("Domain is required.")
+
+            address = await self.solana_kit.resolve_name_to_address(domain)
+            return {
+                "address": address or "Not Found",
+                "message": "Success" if address else "Domain not found."
+            }
+        except Exception as e:
+            return {
+                "address": None,
+                "message": f"Error resolving domain: {str(e)}"
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaSNSRegisterDomainTool(BaseTool):
+    name: str = "solana_sns_register_domain"
+    description: str = """
+    Prepares a transaction to register a new SNS domain.
+
+    Input: A JSON string with:
+    {
+        "domain": "string, the domain to register",
+        "buyer": "string, base58 public key of the buyer's wallet",
+        "buyer_token_account": "string, base58 public key of the buyer's token account",
+        "space": "integer, bytes to allocate for the domain",
+        "mint": "string, optional, the token mint public key (default: USDC)",
+        "referrer_key": "string, optional, base58 public key of the referrer"
+    }
+
+    Output:
+    {
+        "transaction": "string, base64-encoded transaction object",
+        "message": "string, if an error occurs"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            domain = data["domain"]
+            buyer = data["buyer"]
+            buyer_token_account = data["buyer_token_account"]
+            space = data["space"]
+            mint = data.get("mint")
+            referrer_key = data.get("referrer_key")
+
+            if not all([domain, buyer, buyer_token_account, space]):
+                raise ValueError("Domain, buyer, buyer_token_account, and space are required.")
+
+            transaction = await self.solana_kit.get_registration_transaction(
+                domain, buyer, buyer_token_account, space, mint, referrer_key
+            )
+            return {
+                "transaction": transaction,
+                "message": "Success"
+            }
+        except Exception as e:
+            return {
+                "transaction": None,
+                "message": f"Error preparing registration transaction: {str(e)}"
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaSNSGetFavouriteDomainTool(BaseTool):
+    name: str = "solana_sns_get_favourite_domain"
+    description: str = """
+    Fetches the favorite domain of a given owner using Solana Name Service.
+
+    Input: A JSON string with:
+    {
+        "owner": "string, the base58-encoded public key of the domain owner"
+    }
+
+    Output:
+    {
+        "domain": "string, the favorite domain of the owner",
+        "message": "string, if an error occurs"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            owner = data["owner"]
+            if not owner:
+                raise ValueError("Owner address is required.")
+
+            domain = await self.solana_kit.get_favourite_domain(owner)
+            return {
+                "domain": domain or "Not Found",
+                "message": "Success" if domain else "No favorite domain found for this owner."
+            }
+        except Exception as e:
+            return {
+                "domain": None,
+                "message": f"Error fetching favorite domain: {str(e)}"
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+class SolanaSNSGetAllDomainsTool(BaseTool):
+    name: str = "solana_sns_get_all_domains"
+    description: str = """
+    Fetches all domains associated with a given owner using Solana Name Service.
+
+    Input: A JSON string with:
+    {
+        "owner": "string, the base58-encoded public key of the domain owner"
+    }
+
+    Output:
+    {
+        "domains": ["string", "string", ...], # List of domains owned by the owner
+        "message": "string, if an error occurs"
+    }
+    """
+    solana_kit: SolanaAgentKit
+
+    async def _arun(self, input: str):
+        try:
+            data = json.loads(input)
+            owner = data["owner"]
+            if not owner:
+                raise ValueError("Owner address is required.")
+
+            domains = await self.solana_kit.get_all_domains_for_owner(owner)
+            return {
+                "domains": domains or [],
+                "message": "Success" if domains else "No domains found for this owner."
+            }
+        except Exception as e:
+            return {
+                "domains": [],
+                "message": f"Error fetching domains: {str(e)}"
+            }
+
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+
+
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
         SolanaBalanceTool(solana_kit=solana_kit),
@@ -1935,6 +2113,10 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaGetPumpCurveStateTool(solana_kit=solana_kit),
         SolanaCalculatePumpCurvePriceTool(solana_kit=solana_kit),
         SolanaBuyTokenTool(solana_kit=solana_kit),
-        SolanaSellTokenTool(solana_kit=solana_kit)
+        SolanaSellTokenTool(solana_kit=solana_kit),
+        SolanaSNSGetAllDomainsTool(solana_kit=solana_kit),
+        SolanaSNSRegisterDomainTool(solana_kit=solana_kit),
+        SolanaSNSGetFavouriteDomainTool(solana_kit=solana_kit),
+        SolanaSNSResolveTool(solana_kit=solana_kit)
     ]
 
