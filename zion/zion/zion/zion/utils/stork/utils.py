@@ -9,11 +9,6 @@ def get_stork_price(asset_id: str, api_token: str):
         "accept": "application/json",
         "Authorization": f"Basic {api_token}"
     }
-    try:
-        response = requests.get(url, headers=headers)
-        return response.json()
-    except Exception as e:
-        return {
-            "error": str(e)
-        }
-    
+    response = requests.get(url, headers=headers)
+    return response.json()
+
