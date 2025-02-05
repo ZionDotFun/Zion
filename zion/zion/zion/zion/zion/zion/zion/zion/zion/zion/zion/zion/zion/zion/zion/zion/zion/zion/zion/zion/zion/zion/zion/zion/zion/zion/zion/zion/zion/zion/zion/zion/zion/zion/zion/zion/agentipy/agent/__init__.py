@@ -197,14 +197,14 @@ class SolanaAgentKit:
     async def get_balances(self, address: str):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_balances(self, address)
+            return HeliusManager.get_balances(self, address)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
 
     async def get_address_name(self, address: str):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_address_name(self, address)
+            return HeliusManager.get_address_name(self, address)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -222,7 +222,7 @@ class SolanaAgentKit:
             pagination_token: str = None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_nft_events(self, accounts,types,sources,start_slot,end_slot,start_time,end_time,first_verified_creator,verified_collection_address,limit,sort_order,pagination_token)
+            return HeliusManager.get_nft_events(self, accounts,types,sources,start_slot,end_slot,start_time,end_time,first_verified_creator,verified_collection_address,limit,sort_order,pagination_token)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -232,14 +232,14 @@ class SolanaAgentKit:
         pagination_token: str=None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_mintlists(self,first_verified_creators,verified_collection_addresses,limit,pagination_token)
+            return HeliusManager.get_mintlists(self,first_verified_creators,verified_collection_addresses,limit,pagination_token)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
     async def get_nft_fingerprint(self, mints: List[str]):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_nft_fingerprint(self,mints)
+            return HeliusManager.get_nft_fingerprint(self,mints)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -250,14 +250,14 @@ class SolanaAgentKit:
         pagination_token: str=None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_active_listings(self,first_verified_creators,verified_collection_addresses,marketplaces,limit,pagination_token)
+            return HeliusManager.get_active_listings(self,first_verified_creators,verified_collection_addresses,marketplaces,limit,pagination_token)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
     async def get_nft_metadata(self, mint_accounts: List[str]):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_nft_metadata(self,mint_accounts)
+            return HeliusManager.get_nft_metadata(self,mint_accounts)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -272,14 +272,14 @@ class SolanaAgentKit:
         pagination_token: str=None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_raw_transactions(self,accounts,start_slot,end_slot,start_time,end_time,limit,sort_order,pagination_token)
+            return HeliusManager.get_raw_transactions(self,accounts,start_slot,end_slot,start_time,end_time,limit,sort_order,pagination_token)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
     async def get_parsed_transactions(self, transactions: List[str], commitment: str=None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_parsed_transactions(self,transactions,commitment)
+            return HeliusManager.get_parsed_transactions(self,transactions,commitment)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
     
@@ -292,7 +292,7 @@ class SolanaAgentKit:
         type: str=''):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_parsed_transaction_history(self,address,before,until,commitment,source,type)
+            return HeliusManager.get_parsed_transaction_history(self,address,before,until,commitment,source,type)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -305,21 +305,21 @@ class SolanaAgentKit:
         auth_header: str=None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.create_webhook(self,webhook_url,transaction_types,account_addresses,webhook_type,txn_status,auth_header)
+            return HeliusManager.create_webhook(self,webhook_url,transaction_types,account_addresses,webhook_type,txn_status,auth_header)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
     async def get_all_webhooks(self):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_all_webhooks(self)
+            return HeliusManager.get_all_webhooks(self)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
     async def get_webhook(self, webhook_id: str):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.get_webhook(self,webhook_id)
+            return HeliusManager.get_webhook(self,webhook_id)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -333,13 +333,13 @@ class SolanaAgentKit:
         auth_header: str=None):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.edit_webhook(self,webhook_id,webhook_url,transaction_types,account_addresses,webhook_type,txn_status,auth_header)
+            return HeliusManager.edit_webhook(self,webhook_id,webhook_url,transaction_types,account_addresses,webhook_type,txn_status,auth_header)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
 
     async def delete_webhook(self, webhook_id: str):
         from agentipy.tools.use_helius import HeliusManager
         try:
-            return await HeliusManager.delete_webhook(self,webhook_id)
+            return HeliusManager.delete_webhook(self,webhook_id)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
