@@ -5,7 +5,7 @@ from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
 
-from agentipy.constants import DEFAULT_OPTIONS
+from agentipy.constants import BASE_PROXY_URL, DEFAULT_OPTIONS
 from agentipy.types import BondingCurveState, PumpfunTokenOptions
 from agentipy.utils.meteora_dlmm.types import ActivationType
 
@@ -39,10 +39,12 @@ class SolanaAgentKit:
         self.rpc_url = rpc_url or os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
         self.wallet = Keypair.from_base58_string(private_key or os.getenv("SOLANA_PRIVATE_KEY", ""))
         self.wallet_address = self.wallet.pubkey()
+        self.private_key = private_key or os.getenv("SOLANA_PRIVATE_KEY", "")
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY", "")
         self.helius_api_key = helius_api_key or os.getenv("HELIUS_API_KEY", "")
         self.helius_rpc_url = helius_rpc_url or os.getenv("HELIUS_RPC_URL", "")
         self.quicknode_rpc_url = quicknode_rpc_url or os.getenv("QUICKNODE_RPC_URL", "")
+        self.base_proxy_url = BASE_PROXY_URL
 
         self.connection = AsyncClient(self.rpc_url)
 
@@ -414,5 +416,43 @@ class SolanaAgentKit:
         from agentipy.tools.use_sns import NameServiceManager
         try:
             return NameServiceManager.get_registration_transaction(self, domain, buyer, buyer_token_account, space, mint, referrer_key)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+
+    async def deploy_collection(self, name: str, uri: str, royalty_basis_points: int, creator_address: str):
+        from agentipy.tools.use_metaplex import DeployCollectionManager
+        try:
+            return DeployCollectionManager.deploy_collection(self, name, uri, royalty_basis_points, creator_address)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_metaplex_asset(self, assetId:str):
+        from agentipy.tools.use_metaplex import DeployCollectionManager
+        try:
+            return DeployCollectionManager.get_metaplex_asset(self, assetId)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_metaplex_assets_by_creator(self,creator: str, onlyVerified: bool = False, sortBy: str | None = None, sortDirection: str | None = None,
+    limit: int | None = None, page: int | None = None, before: str | None = None, after: str | None = None):
+        from agentipy.tools.use_metaplex import DeployCollectionManager
+        try:
+            return DeployCollectionManager.get_metaplex_assets_by_creator(self, creator, onlyVerified, sortBy, sortDirection, limit, page, before, after)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_metaplex_assets_by_authority(self,authority: str, sortBy: str | None = None, sortDirection: str | None = None,
+    limit: int | None = None, page: int | None = None, before: str | None = None, after: str | None = None):
+        from agentipy.tools.use_metaplex import DeployCollectionManager
+        try:
+            return DeployCollectionManager.get_metaplex_assets_by_authority(self, authority, sortBy, sortDirection, limit, page, before, after)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def mint_metaplex_core_nft(self,collectionMint: str, name: str, uri: str, sellerFeeBasisPoints: int | None = None, address: str | None = None,
+    share: str | None = None, recipient: str | None = None):
+        from agentipy.tools.use_metaplex import DeployCollectionManager
+        try:
+            return DeployCollectionManager.mint_metaplex_core_nft(self, collectionMint, name, uri, sellerFeeBasisPoints, address, share, recipient)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")

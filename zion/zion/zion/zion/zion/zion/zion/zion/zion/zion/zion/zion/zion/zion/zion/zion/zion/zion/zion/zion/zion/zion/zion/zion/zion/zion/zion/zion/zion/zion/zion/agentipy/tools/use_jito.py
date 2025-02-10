@@ -37,4 +37,4 @@ class JitoManager:
         # Correct format for the request
         params = bundle_uuids
         
-        return __send_request(endpoint=endpoint, method="getBundleStatuses", params=params)
+        return __send_request(agent, endpoint=endpoint, method="getBundleStatuses", params=params)
