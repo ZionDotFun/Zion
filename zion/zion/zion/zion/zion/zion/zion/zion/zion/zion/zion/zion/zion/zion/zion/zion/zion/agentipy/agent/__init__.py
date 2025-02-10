@@ -39,6 +39,8 @@ class SolanaAgentKit:
         openai_api_key: Optional[str] = None,
         helius_api_key: Optional[str] = None,
         helius_rpc_url: Optional[str] = None,
+        backpack_api_key: Optional[str] = None,
+        backpack_api_secret: Optional[str] = None,
         quicknode_rpc_url: Optional[str] = None,
         jito_block_engine_url: Optional[str] = None,
         jito_uuid: Optional[str] = None,
@@ -62,6 +64,8 @@ class SolanaAgentKit:
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY", "")
         self.helius_api_key = helius_api_key or os.getenv("HELIUS_API_KEY", "")
         self.helius_rpc_url = helius_rpc_url or os.getenv("HELIUS_RPC_URL", "")
+        self.backpack_api_key = backpack_api_key or os.getenv("BACKPACK_API_KEY", "")
+        self.backpack_api_secret = backpack_api_secret or os.getenv("BACKPACK_API_SECRET", "")
         self.quicknode_rpc_url = quicknode_rpc_url or os.getenv("QUICKNODE_RPC_URL", "")
         self.jito_block_engine_url = jito_block_engine_url or os.getenv("JITO_BLOCK_ENGINE_URL", "")
         self.jito_uuid = jito_uuid or os.getenv("JITO_UUID", None)
@@ -590,3 +594,386 @@ class SolanaAgentKit:
             return JitoManager.send_txn(self, params, bundleOnly)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
+    
+    async def get_account_balances(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_account_balances(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch account balances: {e}")
+
+
+    async def request_withdrawal(self, address: str, blockchain: str, quantity: str, symbol: str, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.request_withdrawal(self, address, blockchain, quantity, symbol, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to request withdrawal: {e}")
+
+
+    async def get_account_settings(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_account_settings(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch account settings: {e}")
+
+
+    async def update_account_settings(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.update_account_settings(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to update account settings: {e}")
+
+
+    async def get_borrow_lend_positions(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_borrow_lend_positions(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch borrow/lend positions: {e}")
+
+
+    async def execute_borrow_lend(self, quantity: str, side: str, symbol: str):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.execute_borrow_lend(self, quantity, side, symbol)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to execute borrow/lend operation: {e}")
+
+
+    async def get_collateral_info(self, sub_account_id: int = None):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_collateral_info(self, sub_account_id)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch collateral information: {e}")
+
+
+    async def get_account_deposits(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_account_deposits(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch account deposits: {e}")
+
+
+    async def get_open_positions(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_open_positions(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch open positions: {e}")
+
+
+    async def get_borrow_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_borrow_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch borrow history: {e}")
+
+
+    async def get_interest_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_interest_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch interest history: {e}")
+
+
+    async def get_fill_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_fill_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch fill history: {e}")
+
+
+    async def get_borrow_position_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_borrow_position_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch borrow position history: {e}")
+
+
+    async def get_funding_payments(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_funding_payments(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch funding payments: {e}")
+
+
+    async def get_order_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_order_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch order history: {e}")
+
+
+    async def get_pnl_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_pnl_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch PNL history: {e}")
+
+
+    async def get_settlement_history(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_settlement_history(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch settlement history: {e}")
+
+
+    async def get_users_open_orders(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_users_open_orders(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch user's open orders: {e}")
+
+
+    async def execute_order(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.execute_order(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to execute order: {e}")
+
+
+    async def cancel_open_order(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.cancel_open_order(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to cancel open order: {e}")
+
+
+    async def get_open_orders(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_open_orders(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch open orders: {e}")
+
+
+    async def cancel_open_orders(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.cancel_open_orders(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to cancel open orders: {e}")
+
+
+    async def get_supported_assets(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_supported_assets(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch supported assets: {e}")
+
+
+    async def get_ticker_information(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_ticker_information(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch ticker information: {e}")
+
+
+    async def get_markets(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_markets(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch markets: {e}")
+
+
+    async def get_market(self, **kwargs):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_market(self, **kwargs)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch market: {e}")
+
+
+    async def get_tickers(self):
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_tickers(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch tickers: {e}")
+    
+    async def get_depth(self, symbol: str):
+        """
+        Retrieves the order book depth for a given market symbol.
+
+        Args:
+            symbol (str): Market symbol.
+
+        Returns:
+            dict: Order book depth.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_depth(self, symbol)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch order book depth: {e}")
+
+
+    async def get_klines(self, symbol: str, interval: str, start_time: int, end_time: int = None):
+        """
+        Get K-Lines for the given market symbol.
+
+        Args:
+            symbol (str): Market symbol.
+            interval (str): Interval for the K-Lines.
+            start_time (int): Start time for the data.
+            end_time (int, optional): End time for the data. Defaults to None.
+
+        Returns:
+            dict: K-Lines data.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_klines(self, symbol, interval, start_time, end_time)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch K-Lines: {e}")
+
+
+    async def get_mark_price(self, symbol: str):
+        """
+        Retrieves mark price, index price, and funding rate for the given market symbol.
+
+        Args:
+            symbol (str): Market symbol.
+
+        Returns:
+            dict: Mark price data.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_mark_price(self, symbol)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch mark price: {e}")
+
+
+    async def get_open_interest(self, symbol: str):
+        """
+        Retrieves the current open interest for the given market.
+
+        Args:
+            symbol (str): Market symbol.
+
+        Returns:
+            dict: Open interest data.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_open_interest(self, symbol)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch open interest: {e}")
+
+
+    async def get_funding_interval_rates(self, symbol: str, limit: int = 100, offset: int = 0):
+        """
+        Funding interval rate history for futures.
+
+        Args:
+            symbol (str): Market symbol.
+            limit (int, optional): Maximum results to return. Defaults to 100.
+            offset (int, optional): Records to skip. Defaults to 0.
+
+        Returns:
+            dict: Funding interval rate data.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_funding_interval_rates(self, symbol, limit, offset)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch funding interval rates: {e}")
+
+
+    async def get_status(self):
+        """
+        Get the system status and the status message, if any.
+
+        Returns:
+            dict: System status.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_status(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch system status: {e}")
+
+
+    async def send_ping(self):
+        """
+        Responds with pong.
+
+        Returns:
+            str: "pong"
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.send_ping(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to send ping: {e}")
+
+
+    async def get_system_time(self):
+        """
+        Retrieves the current system time.
+
+        Returns:
+            str: Current system time.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_system_time(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch system time: {e}")
+
+
+    async def get_recent_trades(self, symbol: str, limit: int = 100):
+        """
+        Retrieve the most recent trades for a symbol.
+
+        Args:
+            symbol (str): Market symbol.
+            limit (int, optional): Maximum results to return. Defaults to 100.
+
+        Returns:
+            dict: Recent trade data.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_recent_trades(self, symbol, limit)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch recent trades: {e}")
+
+
+    async def get_historical_trades(self, symbol: str, limit: int = 100, offset: int = 0):
+        """
+        Retrieves all historical trades for the given symbol.
+
+        Args:
+            symbol (str): Market symbol.
+            limit (int, optional): Maximum results to return. Defaults to 100.
+            offset (int, optional): Records to skip. Defaults to 0.
+
+        Returns:
+            dict: Historical trade data.
+        """
+        from agentipy.tools.use_backpack import BackpackManager
+        try:
+            return await BackpackManager.get_historical_trades(self, symbol, limit, offset)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch historical trades: {e}")

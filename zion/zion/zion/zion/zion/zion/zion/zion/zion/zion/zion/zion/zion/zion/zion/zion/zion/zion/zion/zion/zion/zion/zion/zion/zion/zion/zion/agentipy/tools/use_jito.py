@@ -44,3 +44,17 @@ class JitoManager:
             return __send_request(agent, endpoint="/bundles",method="sendBundle", params=params)
         else:
             return  __send_request(agent, endpoint="/bundles?uuid=" + agent.jito_uuid, method="sendBundle", params=params)
+
+    def get_inflight_bundle_statuses(agent: SolanaAgentKit, bundle_uuids):
+        endpoint = "/bundles"
+        if agent.jito_uuid is not None:
+            endpoint += f"?uuid={agent.jito_uuid}"
+        
+        # Ensure bundle_uuids is a list
+        if not isinstance(bundle_uuids, list):
+            bundle_uuids = [bundle_uuids]
+        
+        # Correct format for the request
+        params = bundle_uuids
+        
+        return __send_request(agent, endpoint=endpoint, method="getInflightBundleStatuses", params=params)
