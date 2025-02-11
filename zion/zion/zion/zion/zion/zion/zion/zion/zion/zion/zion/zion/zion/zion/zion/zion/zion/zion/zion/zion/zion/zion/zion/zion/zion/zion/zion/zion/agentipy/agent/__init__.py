@@ -510,3 +510,45 @@ class SolanaAgentKit:
             return CybersManager.create_coin(self, name, symbol, image_path, tweet_author_id, tweet_author_username)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
+
+    async def get_tip_accounts(self):
+        from agentipy.tools.use_jito import JitoManager
+        try:
+            return JitoManager.get_tip_accounts(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+
+    async def get_random_tip_account():
+        from agentipy.tools.use_jito import JitoManager
+        try:
+            return JitoManager.get_random_tip_account()
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_bundle_statuses(self, bundle_uuids):
+        from agentipy.tools.use_jito import JitoManager
+        try:
+            return JitoManager.get_bundle_statuses(self, bundle_uuids)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+
+    async def send_bundle(self, params=None):
+        from agentipy.tools.use_jito import JitoManager
+        try:
+            return JitoManager.send_bundle(self, params)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def get_inflight_bundle_statuses(self, bundle_uuids):
+        from agentipy.tools.use_jito import JitoManager
+        try:
+            return JitoManager.get_inflight_bundle_statuses(self, bundle_uuids)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def send_txn(self, params=None, bundleOnly=False):
+        from agentipy.tools.use_jito import JitoManager
+        try:
+            return JitoManager.send_txn(self, params, bundleOnly)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
