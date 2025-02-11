@@ -480,14 +480,27 @@ class SolanaAgentKit:
     async def execute_debridge_transaction(self, transaction_data: dict):
         from agentipy.tools.use_debridge import DeBridgeManager   
         try:
-            return DeBridgeManager.execute_debridge_transaction(self, transaction_data)
+            return await DeBridgeManager.execute_debridge_transaction(self, transaction_data)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
     async def check_transaction_status(self, tx_hash: str):
         from agentipy.tools.use_debridge import DeBridgeManager   
         try:
-            return DeBridgeManager.check_transaction_status(self, tx_hash)
+            return await DeBridgeManager.check_transaction_status(self, tx_hash)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+        
+    async def cybers_create_coin(
+        self, 
+        name: str,
+        symbol: str,
+        image_path: str,
+        tweet_author_id: str,
+        tweet_author_username: str):
+        from agentipy.tools.use_cybers import CybersManager   
+        try:
+            return CybersManager.create_coin(self, name, symbol, image_path, tweet_author_id, tweet_author_username)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
