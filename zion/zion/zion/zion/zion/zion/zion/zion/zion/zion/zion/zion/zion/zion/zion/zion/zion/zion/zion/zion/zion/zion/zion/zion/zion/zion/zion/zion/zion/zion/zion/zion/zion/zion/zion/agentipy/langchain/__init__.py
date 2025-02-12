@@ -2507,6 +2507,178 @@ class SolanaCybersCreateCoinTool(BaseTool):
             "This tool only supports async execution via _arun. Please use the async interface."
         )
 
+class SolanaGetTipAccounts(BaseTool):
+    name: str = "get_tip_accounts"
+    description: str = """
+    Get all available Jito tip accounts.
+
+    Output:
+    {
+        "accounts": "List of Jito tip accounts"
+    }
+    """
+    solana_kit: SolanaAgentKit
+    
+    async def _arun(self, input: str):
+        try:
+            result = await self.solana_kit.get_tip_accounts()
+            return {
+                "accounts": result
+            }
+        except Exception as e:
+            return {
+                "accounts": None
+            }
+    
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+        
+class SolanaGetRandomTipAccount(BaseTool):
+    name: str = "get_random_tip_account"
+    description: str = """
+    Get a randomly selected Jito tip account from the existing list.
+
+    Output:
+    {
+        "account": "Randomly selected Jito tip account"
+    }
+    """
+    solana_kit: SolanaAgentKit
+    
+    async def _arun(self, input: str):
+        try:
+            result = await self.solana_kit.get_random_tip_account()
+            return {
+                "account": result
+            }
+        except Exception as e:
+            return {
+                "account": None
+            }
+    
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+        
+class SolanaGetBundleStatuses(BaseTool):
+    name: str = "get_bundle_statuses"
+    description: str = """
+    Get the current statuses of specified Jito bundles.
+
+    Output:
+    {
+        "statuses": "List of corresponding bundle statuses"
+    }
+    """
+    solana_kit: SolanaAgentKit
+    
+    async def _arun(self, input: str):
+        try:
+            bundle_uuids = input["bundle_uuids"]
+            result = await self.solana_kit.get_bundle_statuses(bundle_uuids)
+            return {
+                "statuses": result
+            }
+        except Exception as e:
+            return {
+                "statuses": None
+            }
+    
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+        
+class SolanaSendBundle(BaseTool):
+    name: str = "send_bundle"
+    description: str = """
+    Send a bundle of transactions to the Jito network for processing.
+
+    Output:
+    {
+        "bundle_ids": "List of unique identifiers for the submitted bundles"
+    }
+    """
+    solana_kit: SolanaAgentKit
+    
+    async def _arun(self, input: str):
+        try:
+            params = input["txn_signatures"]
+            result = await self.solana_kit.send_bundle(params)
+            return {
+                "bundle_ids": result
+            }
+        except Exception as e:
+            return {
+                "bundle_ids": None
+            }
+    
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+        
+class SolanaGetInflightBundleStatuses(BaseTool):
+    name: str = "get_inflight_bundle_statuses"
+    description: str = """
+    Get the statuses of bundles that are currently in flight.
+
+    Output:
+    {
+        "statuses": "List of statuses corresponding to currently inflight bundles"
+    }
+    """
+    solana_kit: SolanaAgentKit
+    
+    async def _arun(self, input: str):
+        try:
+            bundle_uuids = input["bundle_uuids"]
+            result = await self.solana_kit.get_inflight_bundle_statuses(bundle_uuids)
+            return {
+                "statuses": result
+            }
+        except Exception as e:
+            return {
+                "statuses": None
+            }
+    
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
+        
+class SolanaSendTxn(BaseTool):
+    name: str = "send_txn"
+    description: str = """
+    Send an individual transaction to the Jito network for processing.
+
+    Output:
+    {
+        "status": "Unique identifier of the processed transaction bundle"
+    }
+    """
+    solana_kit: SolanaAgentKit
+    
+    async def _arun(self, input: str):
+        try:
+            params = [input["txn_signature"]]
+            bundleOnly = input["bundleOnly"]
+            result = await self.solana_kit.send_txn(params, bundleOnly)
+            return {
+                "status": result
+            }
+        except Exception as e:
+            return {
+                "status": None
+            }
+    
+    def _run(self, input: str):
+        raise NotImplementedError(
+            "This tool only supports async execution via _arun. Please use the async interface."
+        )
 
 def create_solana_tools(solana_kit: SolanaAgentKit):
     return [
@@ -2564,5 +2736,11 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaDeBridgeCheckTransactionStatusTool(solana_kit=solana_kit),
         SolanaDeBridgeExecuteTransactionTool(solana_kit=solana_kit),
         SolanaCybersCreateCoinTool(solana_kit=solana_kit),
+        SolanaGetTipAccounts(solana_kit=solana_kit),
+        SolanaGetRandomTipAccount(solana_kit=solana_kit),
+        SolanaGetBundleStatuses(solana_kit=solana_kit),
+        SolanaSendBundle(solana_kit=solana_kit),
+        SolanaGetInflightBundleStatuses(solana_kit=solana_kit),
+        SolanaSendTxn(solana_kit=solana_kit),
     ]
 
