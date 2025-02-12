@@ -8,11 +8,11 @@ class StorkManager:
         """
         Fetch price data for a given asset using the Stork Oracle.
 
-        :param agent: SolanaAgentKit instance with a Stork API key.
+        :param agent: SolanaAgentKit instance.
         :param asset_id: The plaintext asset ID to fetch price data for.
         :return: A dictionary containing the price and timestamp. 
         """
-        price = get_stork_price(asset_id.upper(), agent.stork_api_key)
+        price = get_stork_price(asset_id.capitalize(), agent.stork_api_key)
         
         if "error" in price:
             raise Exception(price["error"])
@@ -20,7 +20,7 @@ class StorkManager:
         if "data" not in price:
             raise Exception("No data found in price response")
 
-        price_data = price["data"][asset_id.upper()]
+        price_data = price["data"][asset_id.capitalize()]
         price = price_data["price"]
 
         # convert price to float, divide by 10^18
