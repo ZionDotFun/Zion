@@ -38,3 +38,9 @@ class JitoManager:
         params = bundle_uuids
         
         return __send_request(agent, endpoint=endpoint, method="getBundleStatuses", params=params)
+
+    def send_bundle(agent: SolanaAgentKit, params=None):
+        if agent.jito_uuid == None:
+            return __send_request(endpoint="/bundles",method="sendBundle", params=params)
+        else:
+            return  __send_request(endpoint="/bundles?uuid=" + agent.jito_uuid, method="sendBundle", params=params)
