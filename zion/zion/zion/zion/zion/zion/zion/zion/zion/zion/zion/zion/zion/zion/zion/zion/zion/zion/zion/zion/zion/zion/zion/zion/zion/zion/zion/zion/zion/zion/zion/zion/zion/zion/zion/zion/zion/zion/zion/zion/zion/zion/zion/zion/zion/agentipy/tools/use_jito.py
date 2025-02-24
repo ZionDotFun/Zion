@@ -58,3 +58,19 @@ class JitoManager:
         params = bundle_uuids
         
         return __send_request(agent, endpoint=endpoint, method="getInflightBundleStatuses", params=params)
+
+    # Transaction Endpoint
+    def send_txn(agent: SolanaAgentKit, params=None, bundleOnly=False):
+        ep = "/transactions"
+        query_params = []
+
+        if bundleOnly:
+            query_params.append("bundleOnly=true")
+        
+        if agent.jito_uuid is not None:
+            query_params.append(f"uuid={agent.jito_uuid}")
+
+        if query_params:
+            ep += "?" + "&".join(query_params)
+
+        return __send_request(endpoint=ep, method="sendTransaction", params=params)
