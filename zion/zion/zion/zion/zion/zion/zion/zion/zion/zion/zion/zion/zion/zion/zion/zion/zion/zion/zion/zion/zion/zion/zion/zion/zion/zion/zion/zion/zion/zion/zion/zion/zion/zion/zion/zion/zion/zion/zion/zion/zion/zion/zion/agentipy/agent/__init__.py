@@ -34,9 +34,7 @@ class SolanaAgentKit:
         openai_api_key: Optional[str] = None,
         helius_api_key: Optional[str] = None,
         helius_rpc_url: Optional[str] = None,
-        quicknode_rpc_url: Optional[str] = None,
-        jito_block_engine_url: Optional[str] = None,
-        jito_uuid: Optional[str] = None,
+        quicknode_rpc_url: Optional[str] = None
     ):
         self.rpc_url = rpc_url or os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
         self.wallet = Keypair.from_base58_string(private_key or os.getenv("SOLANA_PRIVATE_KEY", ""))
@@ -47,12 +45,7 @@ class SolanaAgentKit:
         self.helius_rpc_url = helius_rpc_url or os.getenv("HELIUS_RPC_URL", "")
         self.quicknode_rpc_url = quicknode_rpc_url or os.getenv("QUICKNODE_RPC_URL", "")
         self.base_proxy_url = BASE_PROXY_URL
-        self.jito_block_engine_url = jito_block_engine_url or os.getenv("JITO_BLOCK_ENGINE_URL", "")
-        if jito_uuid == None:
-            self.jito_uuid = None
-        else:
-            self.jito_uuid = os.getenv("JITO_UUID")
-            
+
         self.connection = AsyncClient(self.rpc_url)
 
         if not self.wallet or not self.wallet_address:
@@ -510,45 +503,5 @@ class SolanaAgentKit:
             return CybersManager.create_coin(self, name, symbol, image_path, tweet_author_id, tweet_author_username)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
-
-    async def get_tip_accounts(self):
-        from agentipy.tools.use_jito import JitoManager
-        try:
-            return JitoManager.get_tip_accounts(self)
-        except Exception as e:
-            raise SolanaAgentKitError(f"Failed to {e}")
-
-    async def get_random_tip_account():
-        from agentipy.tools.use_jito import JitoManager
-        try:
-            return JitoManager.get_random_tip_account()
-        except Exception as e:
-            raise SolanaAgentKitError(f"Failed to {e}")
         
-    async def get_bundle_statuses(self, bundle_uuids):
-        from agentipy.tools.use_jito import JitoManager
-        try:
-            return JitoManager.get_bundle_statuses(self, bundle_uuids)
-        except Exception as e:
-            raise SolanaAgentKitError(f"Failed to {e}")
-
-    async def send_bundle(self, params=None):
-        from agentipy.tools.use_jito import JitoManager
-        try:
-            return JitoManager.send_bundle(self, params)
-        except Exception as e:
-            raise SolanaAgentKitError(f"Failed to {e}")
         
-    async def get_inflight_bundle_statuses(self, bundle_uuids):
-        from agentipy.tools.use_jito import JitoManager
-        try:
-            return JitoManager.get_inflight_bundle_statuses(self, bundle_uuids)
-        except Exception as e:
-            raise SolanaAgentKitError(f"Failed to {e}")
-        
-    async def send_txn(self, params=None, bundleOnly=False):
-        from agentipy.tools.use_jito import JitoManager
-        try:
-            return JitoManager.send_txn(self, params, bundleOnly)
-        except Exception as e:
-            raise SolanaAgentKitError(f"Failed to {e}")
