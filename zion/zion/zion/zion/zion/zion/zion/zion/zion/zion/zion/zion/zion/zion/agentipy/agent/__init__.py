@@ -10,11 +10,6 @@ from solders.pubkey import Pubkey  # type: ignore
 from typing_extensions import Union
 
 from agentipy.constants import API_VERSION, BASE_PROXY_URL, DEFAULT_OPTIONS
-from agentipy.tools.use_3land import ThreeLandManager
-from agentipy.tools.use_adrena import AdrenaTradeManager
-from agentipy.tools.use_alldomains import AllDomainsManager
-from agentipy.tools.use_drift import DriftManager
-from agentipy.tools.use_flash import FlashTradeManager
 from agentipy.types import BondingCurveState, PumpfunTokenOptions
 from agentipy.utils.meteora_dlmm.types import ActivationType
 from agentipy.wallet.solana_wallet_client import SolanaWalletClient
@@ -49,6 +44,7 @@ class SolanaAgentKit:
         quicknode_rpc_url: Optional[str] = None,
         jito_block_engine_url: Optional[str] = None,
         jito_uuid: Optional[str] = None,
+        stork_api_key: Optional[str] = None,
         generate_wallet: bool = False,
     ):
         """
@@ -74,6 +70,7 @@ class SolanaAgentKit:
         self.quicknode_rpc_url = quicknode_rpc_url or os.getenv("QUICKNODE_RPC_URL", "")
         self.jito_block_engine_url = jito_block_engine_url or os.getenv("JITO_BLOCK_ENGINE_URL", "")
         self.jito_uuid = jito_uuid or os.getenv("JITO_UUID", None)
+        self.stork_api_key = stork_api_key or os.getenv("STORK_API_KEY", "")
         self.base_proxy_url = BASE_PROXY_URL
         self.api_version = API_VERSION
 
@@ -243,6 +240,13 @@ class SolanaAgentKit:
         from agentipy.tools.use_pyth import PythManager
         try:
             return await PythManager.get_price(mint_str)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to {e}")
+    
+    async def stork_fetch_price(self, asset_id: str):
+        from agentipy.tools.use_stork import StorkManager
+        try:
+            return await StorkManager.get_price(self, asset_id)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
@@ -997,6 +1001,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_adrena import AdrenaTradeManager
             return await AdrenaTradeManager.close_perp_trade_short(self, price, trade_mint)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to close perp short trade: {e}")
@@ -1013,6 +1018,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_adrena import AdrenaTradeManager
             return await AdrenaTradeManager.close_perp_trade_long(self, price, trade_mint)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to close perp long trade: {e}")
@@ -1041,6 +1047,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_adrena import AdrenaTradeManager
             return await AdrenaTradeManager.open_perp_trade_long(
                 self, price, collateral_amount, collateral_mint, leverage, trade_mint, slippage
             )
@@ -1071,6 +1078,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_adrena import AdrenaTradeManager
             return await AdrenaTradeManager.open_perp_trade_short(
                 self, price, collateral_amount, collateral_mint, leverage, trade_mint, slippage
             )
@@ -1100,6 +1108,7 @@ class SolanaAgentKit:
         Returns:
             dict: Transaction details.
         """
+        from agentipy.tools.use_3land import ThreeLandManager
         try:
             return await ThreeLandManager.create_3land_collection(
                 self, collection_symbol, collection_name, collection_description, main_image_url, cover_image_url, is_devnet
@@ -1145,6 +1154,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_3land import ThreeLandManager
             return await ThreeLandManager.create_3land_nft(
                 self,
                 item_name,
@@ -1176,6 +1186,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.create_drift_user_account(self, deposit_amount, deposit_symbol)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to create Drift user account: {e}")
@@ -1195,6 +1206,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.deposit_to_drift_user_account(self, amount, symbol, is_repayment)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to deposit to Drift user account: {e}")
@@ -1214,6 +1226,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.withdraw_from_drift_user_account(self, amount, symbol, is_borrow)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to withdraw from Drift user account: {e}")
@@ -1235,6 +1248,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.trade_using_drift_perp_account(self, amount, symbol, action, trade_type, price)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to trade using Drift perp account: {e}")
@@ -1247,6 +1261,7 @@ class SolanaAgentKit:
             dict: Boolean indicating account existence.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.check_if_drift_account_exists(self)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to check Drift account existence: {e}")
@@ -1259,6 +1274,7 @@ class SolanaAgentKit:
             dict: Account details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.drift_user_account_info(self)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch Drift user account info: {e}")
@@ -1271,6 +1287,7 @@ class SolanaAgentKit:
             dict: List of available Drift markets.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.get_available_drift_markets(self)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch available Drift markets: {e}")
@@ -1287,6 +1304,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.stake_to_drift_insurance_fund(self, amount, symbol)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to stake to Drift insurance fund: {e}")
@@ -1303,6 +1321,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.request_unstake_from_drift_insurance_fund(self, amount, symbol)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to request unstake from Drift insurance fund: {e}")
@@ -1318,6 +1337,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.unstake_from_drift_insurance_fund(self, symbol)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to unstake from Drift insurance fund: {e}")
@@ -1344,6 +1364,7 @@ class SolanaAgentKit:
             dict: Swap transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.drift_swap_spot_token(self, from_symbol, to_symbol, slippage, to_amount, from_amount)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to swap spot token on Drift: {e}")
@@ -1360,6 +1381,7 @@ class SolanaAgentKit:
             dict: Funding rate information.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.get_drift_perp_market_funding_rate(self, symbol, period)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to get Drift perp market funding rate: {e}")
@@ -1377,6 +1399,7 @@ class SolanaAgentKit:
             dict: Entry quote details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.get_drift_entry_quote_of_perp_trade(self, amount, symbol, action)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to get Drift entry quote of perp trade: {e}")
@@ -1392,6 +1415,7 @@ class SolanaAgentKit:
             dict: Lending and borrowing APY details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.get_drift_lend_borrow_apy(self, symbol)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to get Drift lend/borrow APY: {e}")
@@ -1426,6 +1450,7 @@ class SolanaAgentKit:
             dict: Vault creation details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.create_drift_vault(
                 self, name, market_name, redeem_period, max_tokens, min_deposit_amount, management_fee, profit_share, hurdle_rate, permissioned
             )
@@ -1444,6 +1469,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.update_drift_vault_delegate(self, vault, delegate_address)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to update Drift vault delegate: {e}")
@@ -1480,6 +1506,7 @@ class SolanaAgentKit:
             dict: Vault update details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.update_drift_vault(
                 self, vault_address, name, market_name, redeem_period, max_tokens, min_deposit_amount, management_fee, profit_share, hurdle_rate, permissioned
             )
@@ -1497,6 +1524,7 @@ class SolanaAgentKit:
             dict: Vault details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.get_drift_vault_info(self, vault_name)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to get Drift vault info: {e}")
@@ -1513,6 +1541,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.deposit_into_drift_vault(self, amount, vault)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to deposit into Drift vault: {e}")
@@ -1529,6 +1558,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.request_withdrawal_from_drift_vault(self, amount, vault)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to request withdrawal from Drift vault: {e}")
@@ -1544,6 +1574,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.withdraw_from_drift_vault(self, vault)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to withdraw from Drift vault: {e}")
@@ -1559,6 +1590,7 @@ class SolanaAgentKit:
             dict: Derived vault address.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.derive_drift_vault_address(self, name)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to derive Drift vault address: {e}")
@@ -1587,6 +1619,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_drift import DriftManager
             return await DriftManager.trade_using_delegated_drift_vault(self, vault, amount, symbol, action, trade_type, price)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to trade using delegated Drift vault: {e}")
@@ -1607,6 +1640,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_flash import FlashTradeManager
             return await FlashTradeManager.flash_open_trade(self, token, side, collateral_usd, leverage)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to open flash trade: {e}")
@@ -1623,6 +1657,7 @@ class SolanaAgentKit:
             dict: Transaction details.
         """
         try:
+            from agentipy.tools.use_flash import FlashTradeManager
             return await FlashTradeManager.flash_close_trade(self, token, side)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to close flash trade: {e}")
@@ -1638,6 +1673,7 @@ class SolanaAgentKit:
             Optional[str]: The resolved domain's TLD.
         """
         try:
+            from agentipy.tools.use_alldomains import AllDomainsManager
             return await AllDomainsManager.resolve_all_domains(self, domain)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to resolve all domains: {e}")
@@ -1653,6 +1689,7 @@ class SolanaAgentKit:
             Optional[List[str]]: List of owned domains.
         """
         try:
+            from agentipy.tools.use_alldomains import AllDomainsManager
             return await AllDomainsManager.get_owned_domains_for_tld(self, tld)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch owned domains: {e}")
@@ -1665,6 +1702,7 @@ class SolanaAgentKit:
             Optional[List[str]]: List of available TLDs.
         """
         try:
+            from agentipy.tools.use_alldomains import AllDomainsManager
             return await AllDomainsManager.get_all_domains_tlds(self)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch all domains TLDs: {e}")
@@ -1680,6 +1718,164 @@ class SolanaAgentKit:
             Optional[List[str]]: List of owned domains.
         """
         try:
+            from agentipy.tools.use_alldomains import AllDomainsManager
             return await AllDomainsManager.get_owned_all_domains(self, owner)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to fetch owned all domains: {e}")
+        
+    async def send_compressed_airdrop(
+        self, 
+        mint_address: str,
+        amount: float,
+        decimals: int,
+        recipients: List[str],
+        priority_fee_in_lamports: int,
+        should_log: Optional[bool] = False,) -> Optional[List[str]]:
+        try:
+            from agentipy.tools.use_lightprotocol import LightProtocolManager
+            return await LightProtocolManager.send_compressed_airdrop(self, mint_address, amount, decimals, recipients, priority_fee_in_lamports, should_log)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to fetch owned all domains: {e}")
+        
+    async def create_manifest_market(
+        self, 
+        base_mint: str,
+        quote_mint: str,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_manifest import ManifestManager
+            return await ManifestManager.create_market(self, base_mint, quote_mint)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to create manifest market: {e}")
+        
+    async def place_limit_order(
+        self, 
+        market_id: str,
+        quantity: float,
+        side: str,
+        price: float,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_manifest import ManifestManager
+            return await ManifestManager.place_batch_orders(self, market_id, quantity, side, price)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to place limit order: {e}")
+        
+    async def place_batch_orders(
+        self, 
+        market_id: str,
+        orders: List[Dict[str, Any]],
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_manifest import ManifestManager
+            return await ManifestManager.place_batch_orders(self, market_id, orders)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to place batch orders: {e}")
+        
+    async def cancel_all_orders(
+        self, 
+        market_id: str,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_manifest import ManifestManager
+            return await ManifestManager.cancel_all_orders(self, market_id)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to cancel all orders: {e}")
+        
+    async def withdraw_all(
+        self, 
+        market_id: str,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_manifest import ManifestManager
+            return await ManifestManager.withdraw_all(self, market_id)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to withdraw all: {e}")
+            
+    async def create_openbook_market(
+        self, 
+        base_mint: str,
+        quote_mint: str,
+        lot_size: Optional[float] = 1,
+        tick_size: Optional[float] = 0.01,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_openpook import OpenBookManager
+            return await OpenBookManager.create_market(self, base_mint, quote_mint, lot_size, tick_size)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to create openbook market: {e}")
+        
+    async def close_position(
+        self, 
+        position_mint_address: str,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_orca import OrcaManager
+            return await OrcaManager.close_position(self, position_mint_address)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to close position: {e}")
+        
+    
+    async def create_clmm(
+        self, 
+        mint_deploy: str,
+        mint_pair: str,
+        initial_price: float,
+        fee_tier: str,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_orca import OrcaManager
+            return await OrcaManager.close_position(self, mint_deploy, mint_pair, initial_price, fee_tier)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to create clmm: {e}")
+    
+    async def create_liquidity_pool(
+        self, 
+        deposit_token_amount: float,
+        deposit_token_mint: str,
+        other_token_mint: str,
+        initial_price: float,
+        max_price: float,
+        fee_tier: str,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_orca import OrcaManager
+            return await OrcaManager.create_liquidity_pool(self, deposit_token_amount, deposit_token_mint, other_token_mint, initial_price, max_price, fee_tier)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to create liquidity pool: {e}")
+    
+    async def fetch_positions(
+        self
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_orca import OrcaManager
+            return await OrcaManager.fetch_positions(self)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to close position: {e}")
+    
+    async def open_centered_position(
+        self, 
+        whirlpool_address: str,
+        price_offset_bps: int,
+        input_token_mint: str,
+        input_amount: float,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_orca import OrcaManager
+            return await OrcaManager.open_centered_position(self, whirlpool_address, price_offset_bps, input_token_mint, input_amount)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to open centered position: {e}")
+        
+    async def open_single_sided_position(
+        self, 
+        whirlpool_address: str,
+        distance_from_current_price_bps: int,
+        width_bps: int,
+        input_token_mint: str,
+        input_amount: float,
+        ) -> Optional[Dict[str, Any]]:
+        try:
+            from agentipy.tools.use_orca import OrcaManager
+            return await OrcaManager.open_single_sided_position(self, whirlpool_address, distance_from_current_price_bps, width_bps, input_token_mint, input_amount)
+        except Exception as e:
+            raise SolanaAgentKitError(f"Failed to open single sided position: {e}")
