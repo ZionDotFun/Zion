@@ -1,13 +1,20 @@
+import logging
 import os
 from typing import List, Optional
 
+import base58
+from solana.rpc.api import Client
 from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
+from typing_extensions import Union
 
 from agentipy.constants import BASE_PROXY_URL, DEFAULT_OPTIONS
 from agentipy.types import BondingCurveState, PumpfunTokenOptions
 from agentipy.utils.meteora_dlmm.types import ActivationType
+from agentipy.wallet.solana_wallet_client import SolanaWalletClient
+
+logger = logging.getLogger(__name__)
 
 
 class SolanaAgentKitError(Exception):
@@ -17,14 +24,12 @@ class SolanaAgentKitError(Exception):
 
 class SolanaAgentKit:
     """
-    Main class for interacting with Solana blockchain.
-    Provides a unified interface for token operations, NFT management, and trading.
+    Main class for interacting with the Solana blockchain.
 
     Attributes:
         connection (AsyncClient): Solana RPC connection.
-        wallet (Keypair): Wallet keypair for signing transactions.
+        wallet (SolanaWalletClient): Wallet client for signing and sending transactions.
         wallet_address (Pubkey): Public key of the wallet.
-        openai_api_key (str): OpenAI API key for additional functionality.
     """
 
     def __init__(
@@ -37,26 +42,51 @@ class SolanaAgentKit:
         quicknode_rpc_url: Optional[str] = None,
         jito_block_engine_url: Optional[str] = None,
         jito_uuid: Optional[str] = None,
+        generate_wallet: bool = False,
     ):
+        """
+        Initialize the SolanaAgentKit.
+
+        Args:
+            private_key (str, optional): Base58-encoded private key for the wallet. Ignored if `generate_wallet` is True.
+            rpc_url (str, optional): Solana RPC URL.
+            openai_api_key (str, optional): OpenAI API key for additional functionality.
+            helius_api_key (str, optional): Helius API key for additional services.
+            helius_rpc_url (str, optional): Helius RPC URL.
+            quicknode_rpc_url (str, optional): QuickNode RPC URL.
+            jito_block_engine_url (str, optional): Jito block engine URL for Solana.
+            jito_uuid (str, optional): Jito UUID for authentication.
+            generate_wallet (bool): If True, generates a new wallet and returns the details.
+        """
         self.rpc_url = rpc_url or os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
-        self.wallet = Keypair.from_base58_string(private_key or os.getenv("SOLANA_PRIVATE_KEY", ""))
-        self.wallet_address = self.wallet.pubkey()
-        self.private_key = private_key or os.getenv("SOLANA_PRIVATE_KEY", "")
         self.openai_api_key = openai_api_key or os.getenv("OPENAI_API_KEY", "")
         self.helius_api_key = helius_api_key or os.getenv("HELIUS_API_KEY", "")
         self.helius_rpc_url = helius_rpc_url or os.getenv("HELIUS_RPC_URL", "")
         self.quicknode_rpc_url = quicknode_rpc_url or os.getenv("QUICKNODE_RPC_URL", "")
-        self.base_proxy_url = BASE_PROXY_URL
         self.jito_block_engine_url = jito_block_engine_url or os.getenv("JITO_BLOCK_ENGINE_URL", "")
-        if jito_uuid == None:
-            self.jito_uuid = None
+        self.jito_uuid = jito_uuid or os.getenv("JITO_UUID", None)
+
+        if generate_wallet:
+            self.wallet = Keypair()
+            self.wallet_address = self.wallet.pubkey()
+            self.private_key = base58.b58encode(self.wallet.secret()).decode("utf-8")
         else:
-            self.jito_uuid = os.getenv("JITO_UUID")
-            
-        self.connection = AsyncClient(self.rpc_url)
+            self.private_key = private_key or os.getenv("SOLANA_PRIVATE_KEY", "")
+            self.wallet = Keypair.from_base58_string(self.private_key)
+            self.wallet_address = self.wallet.pubkey()
 
         if not self.wallet or not self.wallet_address:
-            raise SolanaAgentKitError("A valid private key must be provided.")
+            raise ValueError("A valid private key must be provided or a wallet must be generated.")
+
+        self.connection = AsyncClient(self.rpc_url)
+        self.connection_client = Client(self.rpc_url)
+
+        self.wallet_client = SolanaWalletClient(self.connection_client, self.wallet)
+
+        if generate_wallet:
+            logger.info("New Wallet Generated:")
+            logger.info(f"Public Key: {self.wallet_address}")
+            logger.info(f"Private Key: {self.private_key}")
 
     async def request_faucet_funds(self):
         from agentipy.tools.request_faucet_funds import FaucetManager
@@ -440,24 +470,32 @@ class SolanaAgentKit:
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
-    async def get_metaplex_assets_by_creator(self,creator: str, onlyVerified: bool = False, sortBy: str | None = None, sortDirection: str | None = None,
-    limit: int | None = None, page: int | None = None, before: str | None = None, after: str | None = None):
+    async def get_metaplex_assets_by_creator(self,creator: str, onlyVerified: bool = False, sortBy: Union[str, None] = None,
+    sortDirection: Union[str, None] = None,
+    limit: Union[int, None] = None,
+    page: Union[int, None] = None,
+    before: Union[str, None] = None,
+    after: Union[str, None] = None):
         from agentipy.tools.use_metaplex import DeployCollectionManager
         try:
             return DeployCollectionManager.get_metaplex_assets_by_creator(self, creator, onlyVerified, sortBy, sortDirection, limit, page, before, after)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
-    async def get_metaplex_assets_by_authority(self,authority: str, sortBy: str | None = None, sortDirection: str | None = None,
-    limit: int | None = None, page: int | None = None, before: str | None = None, after: str | None = None):
+    async def get_metaplex_assets_by_authority(self,authority: str, sortBy: Union[str, None] = None,
+    sortDirection: Union[str, None] = None,
+    limit: Union[int, None] = None,
+    page: Union[int, None] = None,
+    before: Union[str, None] = None,
+    after: Union[str, None] = None):
         from agentipy.tools.use_metaplex import DeployCollectionManager
         try:
             return DeployCollectionManager.get_metaplex_assets_by_authority(self, authority, sortBy, sortDirection, limit, page, before, after)
         except Exception as e:
             raise SolanaAgentKitError(f"Failed to {e}")
         
-    async def mint_metaplex_core_nft(self,collectionMint: str, name: str, uri: str, sellerFeeBasisPoints: int | None = None, address: str | None = None,
-    share: str | None = None, recipient: str | None = None):
+    async def mint_metaplex_core_nft(self,collectionMint: str, name: str, uri: str, sellerFeeBasisPoints: Union[int, None] = None, address: Union[str, None] = None,
+    share: Union[str, None] = None, recipient: Union[str, None] = None):
         from agentipy.tools.use_metaplex import DeployCollectionManager
         try:
             return DeployCollectionManager.mint_metaplex_core_nft(self, collectionMint, name, uri, sellerFeeBasisPoints, address, share, recipient)
