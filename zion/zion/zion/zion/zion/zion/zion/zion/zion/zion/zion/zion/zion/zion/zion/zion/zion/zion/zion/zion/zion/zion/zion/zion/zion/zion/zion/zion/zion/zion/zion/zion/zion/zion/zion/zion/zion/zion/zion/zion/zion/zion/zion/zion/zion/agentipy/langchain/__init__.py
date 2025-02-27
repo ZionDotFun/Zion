@@ -476,7 +476,7 @@ class SolanaMeteoraDLMMTool(BaseTool):
         "initial_price": 1.23,
         "price_rounding_up": true,
         "fee_bps": 300,
-        "activation_type": "Instant",  // Options: "Instant", "Delayed", "Manual"
+        "activation_type": "Slot",  // Options: "Slot", "Timestamp"
         "has_alpha_vault": false,
         "activation_point": null      // Optional, only for Delayed type
     }
@@ -502,6 +502,12 @@ class SolanaMeteoraDLMMTool(BaseTool):
             for key in required_keys:
                 if key not in data:
                     raise ValueError(f"Missing required key: {key}")
+                
+            if not isinstance(data["bin_step"], int) or data["bin_step"] <= 0:
+                raise ValueError("bin_step must be a positive integer")
+    
+            if not isinstance(data["fee_bps"], int) or not (0 <= data["fee_bps"] <= 10000):
+                raise ValueError("fee_bps must be an integer between 0 and 10000")
 
             activation_type_mapping = {
                 "Slot": ActivationType.Slot,
@@ -2679,45 +2685,6 @@ class SolanaSendTxn(BaseTool):
         raise NotImplementedError(
             "This tool only supports async execution via _arun. Please use the async interface."
         )
-
-
-class StorkGetPriceTool(BaseTool):
-    name: str = "stork_get_price"
-    description: str = """
-    Fetch the price of an asset using the Stork Oracle.
-
-    Input: A JSON string with:
-    {
-        "asset_id": "string, the asset pair ID to fetch price data for (e.g., SOLUSD)."
-    }
-
-    Output:
-    {
-        "price": float, # the token price,
-        "timestamp": int, # the unix nanosecond timestamp of the price
-    }
-    """
-    solana_kit: SolanaAgentKit
-
-    async def _arun(self, input: str):
-        try:
-            data = json.loads(input)
-            asset_id = data["asset_id"]
-            
-            result = await self.solana_kit.stork_fetch_price(asset_id)
-            return {
-                "status": "success",
-                "data": result,
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": str(e),
-            }
-
-    def _run(self, input: str):
-        raise NotImplementedError("This tool only supports async execution via _arun. Please use the async interface.")
-    
 class BackpackGetAccountBalancesTool(BaseTool):
     name: str = "backpack_get_account_balances"
     description: str = """
@@ -5350,7 +5317,6 @@ def create_solana_tools(solana_kit: SolanaAgentKit):
         SolanaSendBundle(solana_kit=solana_kit),
         SolanaGetInflightBundleStatuses(solana_kit=solana_kit),
         SolanaSendTxn(solana_kit=solana_kit),
-        StorkGetPriceTool(solana_kit=solana_kit),
         BackpackCancelOpenOrdersTool(solana_kit=solana_kit),
         BackpackCancelOpenOrderTool(solana_kit=solana_kit),
         BackpackGetBorrowLendPositionsTool(solana_kit=solana_kit),
