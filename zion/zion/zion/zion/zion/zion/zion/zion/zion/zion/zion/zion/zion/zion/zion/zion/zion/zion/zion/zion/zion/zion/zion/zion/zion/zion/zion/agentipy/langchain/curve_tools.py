@@ -91,11 +91,3 @@ class SolanaCalculatePumpCurvePriceTool(BaseTool):
 
     def _run(self):
         raise NotImplementedError("This tool only supports async execution.")
-
-
-
-def get_curve_tools(solana_kit: SolanaAgentKit):
-    return [
-        SolanaGetPumpCurveStateTool(solana_kit=solana_kit),
-        SolanaCalculatePumpCurvePriceTool(solana_kit=solana_kit),
-    ]
