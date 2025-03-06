@@ -1,6 +1,10 @@
 import json
-from agentipy.agent import SolanaAgentKit
+
 from langchain.tools import BaseTool
+
+from agentipy.agent import SolanaAgentKit
+from agentipy.helpers import validate_input
+
 
 class SolayerRestakeTool(BaseTool):
     name: str = "solayer_restake"
