@@ -6,6 +6,7 @@ from solders.pubkey import Pubkey  # type: ignore
 from agentipy.agent import SolanaAgentKit
 from agentipy.helpers import validate_input
 from agentipy.tools import create_image
+from agentipy.utils import toJSON
 from agentipy.utils.meteora_dlmm.types import ActivationType
 
 
@@ -58,7 +59,7 @@ class SolanaTransferTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {  
                 "to": {"type": str, "required": True},
                 "amount": {"type": int, "required": True, "min": 1},
@@ -106,7 +107,7 @@ class SolanaDeployTokenTool(BaseTool):
 
         try:
            
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "decimals": {"type": int, "required": True, "min": 0, "max": 9},
                 "initialSupply": {"type": int, "required": True, "min": 1}
@@ -151,7 +152,7 @@ class SolanaTradeTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "output_mint": {"type": str, "required": True},
                 "input_amount": {"type": int, "required": True, "min": 1},
@@ -282,7 +283,7 @@ class SolanaCreateImageTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "prompt": {"type": str, "required": True},
                 "size": {"type": str, "required": False},
@@ -362,7 +363,7 @@ class SolanaPumpFunTokenTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "token_name": {"type": str, "required": True},
                 "token_ticker": {"type": str, "required": True},
@@ -410,7 +411,7 @@ class SolanaFetchPriceTool(BaseTool):
 
     async def call(self, input: str) -> str:
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "token_id": {"type": str, "required": True}
             }
@@ -449,7 +450,7 @@ class SolanaTokenDataTool(BaseTool):
 
     async def call(self, input: str) -> str:
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint_address": {"type": str, "required": True}
             }
@@ -487,7 +488,7 @@ class SolanaTokenDataByTickerTool(BaseTool):
 
     async def call(self, input: str) -> str:
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "ticker": {"type": str, "required": True}
             }
@@ -537,7 +538,7 @@ class SolanaMeteoraDLMMTool(BaseTool):
 
     async def _arun(self, input: str) -> dict:
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "bin_step": {"type": int, "required": True},
                 "token_a_mint": {"type": str, "required": True},
@@ -612,7 +613,7 @@ class SolanaRaydiumBuyTool(BaseTool):
     async def _arun(self, input: str):
         try:
             required_fields = ["pair_address", "sol_in", "slippage"]
-            data = json.loads(input)
+            data = toJSON(input)
 
             for field in required_fields:
                 if field not in data:
@@ -672,7 +673,7 @@ class SolanaRaydiumSellTool(BaseTool):
                 "percentage",
                 "slippage"
             ]
-            data = json.loads(input)
+            data = toJSON(input)
             
             for key in required_keys:
                 if key not in data:
@@ -724,7 +725,7 @@ class SolanaBurnAndCloseTool(BaseTool):
     async def _arun(self, input: str):
         try:
             required_fields = ["token_account"]
-            data = json.loads(input)
+            data = toJSON(input)
 
             for field in required_fields:
                 if field not in data:
@@ -769,7 +770,7 @@ class SolanaBurnAndCloseMultipleTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "token_accounts": {"type": list, "required": True}
             }
@@ -816,7 +817,7 @@ class SolanaCreateGibworkTaskTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "title": {"type": str, "required": True},
                 "content": {"type": str, "required": True},
@@ -870,7 +871,7 @@ class SolanaBuyUsingMoonshotTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint_str": {"type": str, "required": True},
                 "collateral_amount": {"type": float, "required": False, "min": 0},
@@ -918,7 +919,7 @@ class SolanaSellUsingMoonshotTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint_str": {"type": str, "required": True},
                 "token_balance": {"type": float, "required": False, "min": 0},
@@ -972,7 +973,7 @@ class SolanaPythGetPriceTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint_address": {"type": str, "required": True}
             }
@@ -1017,7 +1018,7 @@ class SolanaHeliusGetBalancesTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "address": {"type": str, "required": True}
             }
@@ -1060,7 +1061,7 @@ class SolanaHeliusGetAddressNameTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "address": {"type": str, "required": True}
             }
@@ -1114,7 +1115,7 @@ class SolanaHeliusGetNftEventsTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "accounts": {"type": list, "required": True},
                 "types": {"type": list, "required": False},
@@ -1184,7 +1185,7 @@ class SolanaHeliusGetMintlistsTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "first_verified_creators": {"type": list, "required": True},
                 "verified_collection_addresses": {"type": list, "required": False},
@@ -1231,7 +1232,7 @@ class SolanaHeliusGetNFTFingerprintTool(BaseTool):
 
     async def _arun(self, input: str):
         try:    
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mints": {"type": list, "required": True}
             }
@@ -1279,7 +1280,7 @@ class SolanaHeliusGetActiveListingsTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "first_verified_creators": {"type": list, "required": True},
                 "verified_collection_addresses": {"type": list, "required": False},
@@ -1329,7 +1330,7 @@ class SolanaHeliusGetNFTMetadataTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint_addresses": {"type": list, "required": True}
             }
@@ -1380,7 +1381,7 @@ class SolanaHeliusGetRawTransactionsTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "signatures": {"type": list, "required": True},
                 "start_slot": {"type": int, "required": False},
@@ -1442,7 +1443,7 @@ class SolanaHeliusGetParsedTransactionsTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "signatures": {"type": list, "required": True},
                 "commitment": {"type": str, "required": False}
@@ -1494,7 +1495,7 @@ class SolanaHeliusGetParsedTransactionHistoryTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "address": {"type": str, "required": True},
                 "before": {"type": str, "required": False},
@@ -1556,7 +1557,7 @@ class SolanaHeliusCreateWebhookTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "webhook_url": {"type": str, "required": True},
                 "transaction_types": {"type": list, "required": True},
@@ -1646,7 +1647,7 @@ class SolanaHeliusGetWebhookTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "webhook_id": {"type": str, "required": True}
             }
@@ -1701,7 +1702,7 @@ class SolanaHeliusEditWebhookTool(BaseTool):
                 "account_addresses": {"type": list, "required": True},
                 "webhook_type": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
          
             webhook_id = data["webhook_id"]
@@ -1754,7 +1755,7 @@ class SolanaHeliusDeleteWebhookTool(BaseTool):
             schema = {
                 "webhook_id": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             webhook_id = data["webhook_id"] 
             result = await self.solana_kit.delete_webhook(webhook_id)
@@ -1797,7 +1798,7 @@ class SolanaFetchTokenReportSummaryTool(BaseTool):
         Asynchronous implementation of the tool.
         """
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint": {"type": str, "required": True}
             }
@@ -1847,7 +1848,7 @@ class SolanaFetchTokenDetailedReportTool(BaseTool):
         Asynchronous implementation of the tool.
         """
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint": {"type": str, "required": True}
             }
@@ -1895,7 +1896,7 @@ class SolanaGetPumpCurveStateTool(BaseTool):
 
     async def _arun(self, input: str):
         try:    
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "conn": {"type": str, "required": True},
                 "curve_address": {"type": str, "required": True}
@@ -1940,7 +1941,7 @@ class SolanaCalculatePumpCurvePriceTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "curve_state": {"type": str, "required": True}
             }
@@ -1987,7 +1988,7 @@ class SolanaBuyTokenTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint": {"type": str, "required": True},
                 "bonding_curve": {"type": str, "required": True},
@@ -2046,7 +2047,7 @@ class SolanaSellTokenTool(BaseTool):
 
     async def _arun(self, input: str):
         try:    
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "mint": {"type": str, "required": True},
                 "bonding_curve": {"type": str, "required": True},
@@ -2100,7 +2101,7 @@ class SolanaSNSResolveTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "domain": {"type": str, "required": True}
             }
@@ -2151,7 +2152,7 @@ class SolanaSNSRegisterDomainTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "domain": {"type": str, "required": True},
                 "buyer": {"type": str, "required": True},
@@ -2207,7 +2208,7 @@ class SolanaSNSGetFavouriteDomainTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "owner": {"type": str, "required": True}
             }
@@ -2253,7 +2254,7 @@ class SolanaSNSGetAllDomainsTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "owner": {"type": str, "required": True}
             }
@@ -2301,7 +2302,7 @@ class SolanaDeployCollectionTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "name": {"type": str, "required": True},
                 "uri": {"type": str, "required": True},
@@ -2349,7 +2350,7 @@ class SolanaGetMetaplexAssetTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "asset_id": {"type": str, "required": True}
             }
@@ -2391,7 +2392,7 @@ class SolanaGetMetaplexAssetsByCreatorTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "creator": {"type": str, "required": True},
                 "only_verified": {"type": bool, "required": False},
@@ -2449,7 +2450,7 @@ class SolanaGetMetaplexAssetsByAuthorityTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "authority": {"type": str, "required": True},
                 "sort_by": {"type": str, "required": False},
@@ -2506,7 +2507,7 @@ class SolanaMintMetaplexCoreNFTTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "collection_mint": {"type": str, "required": True},
                 "name": {"type": str, "required": True},
@@ -2573,7 +2574,7 @@ class SolanaDeBridgeCreateTransactionTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "src_chain_id": {"type": str, "required": True},
                 "src_chain_token_in": {"type": str, "required": True},
@@ -2639,7 +2640,7 @@ class SolanaDeBridgeExecuteTransactionTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "transaction_data": {"type": dict, "required": True}
             }
@@ -2683,7 +2684,7 @@ class SolanaDeBridgeCheckTransactionStatusTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "tx_hash": {"type": str, "required": True}
             }
@@ -2731,7 +2732,7 @@ class SolanaCybersCreateCoinTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "name": {"type": str, "required": True},
                 "symbol": {"type": str, "required": True},
@@ -2844,7 +2845,7 @@ class SolanaGetBundleStatuses(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "bundle_uuids": {"type": list, "required": True}
             }
@@ -2884,7 +2885,7 @@ class SolanaSendBundle(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "txn_signatures": {"type": list, "required": True}
             }
@@ -2924,7 +2925,7 @@ class SolanaGetInflightBundleStatuses(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "bundle_uuids": {"type": list, "required": True}
             }
@@ -2965,7 +2966,7 @@ class SolanaSendTxn(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "txn_signature": {"type": str, "required": True},
                 "bundleOnly": {"type": bool, "required": True}
@@ -3079,7 +3080,7 @@ class BackpackRequestWithdrawalTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "address": {"type": str, "required": True},
                 "blockchain": {"type": str, "required": True},
@@ -3221,7 +3222,7 @@ class BackpackExecuteBorrowLendTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "quantity": {"type": str, "required": True},
                 "side": {"type": str, "required": True},
@@ -3759,7 +3760,7 @@ class BackpackGetDepthTool(BaseTool):
 
     async def _arun(self, input: str):
         try:
-            data = json.loads(input)
+            data = toJSON(input)
             schema = {
                 "symbol": {"type": str, "required": True}
             }
@@ -3807,7 +3808,7 @@ class BackpackGetKlinesTool(BaseTool):
                 "interval": {"type": str, "required": True},
                 "start_time": {"type": int, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             
@@ -3852,7 +3853,7 @@ class BackpackGetMarkPriceTool(BaseTool):
             schema = {
                 "symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             symbol = data["symbol"]
@@ -3892,7 +3893,7 @@ class BackpackGetOpenInterestTool(BaseTool):
             schema = {
                 "symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             symbol = data["symbol"]
@@ -3936,7 +3937,7 @@ class BackpackGetFundingIntervalRatesTool(BaseTool):
                 "limit": {"type": int, "required": False},
                 "offset": {"type": int, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             symbol = data["symbol"]
@@ -4075,7 +4076,7 @@ class BackpackGetRecentTradesTool(BaseTool):
                 "symbol": {"type": str, "required": True},
                 "limit": {"type": int, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             symbol = data["symbol"]
@@ -4124,7 +4125,7 @@ class BackpackGetHistoricalTradesTool(BaseTool):
                 "limit": {"type": int, "required": False},
                 "offset": {"type": int, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             symbol = data["symbol"]
@@ -4171,7 +4172,7 @@ class BackpackGetCollateralInfoTool(BaseTool):
             schema = {
                 "sub_account_id": {"type": int, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             collateral_info = await self.solana_kit.get_collateral_info(
@@ -4209,7 +4210,7 @@ class BackpackGetAccountDepositsTool(BaseTool):
             schema = {
                 "sub_account_id": {"type": int, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             sub_account_id = data.get("sub_account_id")
@@ -4345,7 +4346,7 @@ class ClosePerpTradeShortTool(BaseTool):
                 "price": {"type": float, "required": True},
                 "trade_mint": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             price = data["price"]
@@ -4392,7 +4393,7 @@ class ClosePerpTradeLongTool(BaseTool):
                 "price": {"type": float, "required": True},
                 "trade_mint": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             price = data["price"]
@@ -4447,7 +4448,7 @@ class OpenPerpTradeLongTool(BaseTool):
                 "trade_mint": {"type": str, "required": False},
                 "slippage": {"type": float, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             
@@ -4505,7 +4506,7 @@ class OpenPerpTradeShortTool(BaseTool):
                 "trade_mint": {"type": str, "required": False},
                 "slippage": {"type": float, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             transaction = await self.solana_kit.open_perp_trade_short(  
@@ -4562,7 +4563,7 @@ class Create3LandCollectionTool(BaseTool):
                 "cover_image_url": {"type": str, "required": False},
                 "is_devnet": {"type": bool, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             
@@ -4634,7 +4635,7 @@ class Create3LandNFTTool(BaseTool):
                 "is_devnet": {"type": bool, "required": False},
                 "with_pool": {"type": bool, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
            
@@ -4691,7 +4692,7 @@ class CreateDriftUserAccountTool(BaseTool):
                 "deposit_amount": {"type": float, "required": True},
                 "deposit_symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             transaction = await self.solana_kit.create_drift_user_account(
                 deposit_amount=data["deposit_amount"],
@@ -4736,7 +4737,7 @@ class DepositToDriftUserAccountTool(BaseTool):
                 "symbol": {"type": str, "required": True},
                 "is_repayment": {"type": bool, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
            
@@ -4785,7 +4786,7 @@ class WithdrawFromDriftUserAccountTool(BaseTool):
                 "symbol": {"type": str, "required": True},
                 "is_borrow": {"type": bool, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
           
 
@@ -4837,7 +4838,7 @@ class TradeUsingDriftPerpAccountTool(BaseTool):
                 "trade_type": {"type": str, "required": True},
                 "price": {"type": float, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             transaction = await self.solana_kit.trade_using_drift_perp_account(
                 amount=data["amount"],
@@ -4973,7 +4974,7 @@ class StakeToDriftInsuranceFundTool(BaseTool):
                 "amount": {"type": float, "required": True},
                 "symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
             
@@ -5019,7 +5020,7 @@ class RequestUnstakeFromDriftInsuranceFundTool(BaseTool):
                 "amount": {"type": float, "required": True},
                 "symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
          
@@ -5062,7 +5063,7 @@ class UnstakeFromDriftInsuranceFundTool(BaseTool):
             schema = {
                 "symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
 
            
@@ -5112,7 +5113,7 @@ class DriftSwapSpotTokenTool(BaseTool):
                 "to_amount": {"type": float, "required": False},
                 "from_amount": {"type": float, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)           
             transaction = await self.solana_kit.drift_swap_spot_token(
                 from_symbol=data["from_symbol"],
@@ -5158,7 +5159,7 @@ class GetDriftPerpMarketFundingRateTool(BaseTool):
                 "symbol": {"type": str, "required": True},
                 "period": {"type": str, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)            
             funding_rate = await self.solana_kit.get_drift_perp_market_funding_rate(
                 symbol=data["symbol"],
@@ -5203,7 +5204,7 @@ class GetDriftEntryQuoteOfPerpTradeTool(BaseTool):
                 "symbol": {"type": str, "required": True},
                 "action": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             entry_quote = await self.solana_kit.get_drift_entry_quote_of_perp_trade(
                 amount=data["amount"],
@@ -5245,7 +5246,7 @@ class GetDriftLendBorrowApyTool(BaseTool):
             schema = {
                 "symbol": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
                
             apy_data = await self.solana_kit.get_drift_lend_borrow_apy(
@@ -5302,7 +5303,7 @@ class CreateDriftVaultTool(BaseTool):
                 "hurdle_rate": {"type": float, "required": False},
                 "permissioned": {"type": bool, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             vault_details = await self.solana_kit.create_drift_vault(
@@ -5353,7 +5354,7 @@ class UpdateDriftVaultDelegateTool(BaseTool):
                 "vault": {"type": str, "required": True},
                 "delegate_address": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             transaction = await self.solana_kit.update_drift_vault_delegate(
@@ -5413,7 +5414,7 @@ class UpdateDriftVaultTool(BaseTool):
                 "hurdle_rate": {"type": float, "required": False},
                 "permissioned": {"type": bool, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             vault_update = await self.solana_kit.update_drift_vault(
@@ -5463,7 +5464,7 @@ class GetDriftVaultInfoTool(BaseTool):
             schema = {
                 "vault_name": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             vault_info = await self.solana_kit.get_drift_vault_info(
@@ -5506,7 +5507,7 @@ class DepositIntoDriftVaultTool(BaseTool):
                 "amount": {"type": float, "required": True},
                 "vault": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             transaction = await self.solana_kit.deposit_into_drift_vault(
@@ -5550,7 +5551,7 @@ class RequestWithdrawalFromDriftVaultTool(BaseTool):
                 "amount": {"type": float, "required": True},
                 "vault": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             transaction = await self.solana_kit.request_withdrawal_from_drift_vault(
@@ -5592,7 +5593,7 @@ class WithdrawFromDriftVaultTool(BaseTool):
             schema = {
                 "vault": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             transaction = await self.solana_kit.withdraw_from_drift_vault(
@@ -5633,7 +5634,7 @@ class DeriveDriftVaultAddressTool(BaseTool):
             schema = {
                 "name": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             vault_address = await self.solana_kit.derive_drift_vault_address(
@@ -5684,7 +5685,7 @@ class TradeUsingDelegatedDriftVaultTool(BaseTool):
                 "trade_type": {"type": str, "required": True},
                 "price": {"type": float, "required": False}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             transaction = await self.solana_kit.trade_using_delegated_drift_vault(
@@ -5736,7 +5737,7 @@ class FlashOpenTradeTool(BaseTool):
                 "collateralUsd": {"type": float, "required": True},
                 "leverage": {"type": float, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
            
             transaction = await self.solana_kit.flash_open_trade(
@@ -5782,7 +5783,7 @@ class FlashCloseTradeTool(BaseTool):
                 "token": {"type": str, "required": True},
                 "side": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)         
             transaction = await self.solana_kit.flash_close_trade(
                 token=data["token"],
@@ -5823,7 +5824,7 @@ class ResolveAllDomainsTool(BaseTool):
             schema = {
                 "domain": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             
             domain_tld = await self.solana_kit.resolve_all_domains(data["domain"])
@@ -5856,7 +5857,7 @@ class GetOwnedDomainsForTLDTool(BaseTool):
             schema = {
                 "tld": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             owned_domains = await self.solana_kit.get_owned_domains_for_tld(data["tld"])
             return {"domains": owned_domains, "message": "Success"} if owned_domains else {"message": "No owned domains found"}
@@ -5912,7 +5913,7 @@ class GetOwnedAllDomainsTool(BaseTool):
             schema = {
                 "owner": {"type": str, "required": True}
             }
-            data = json.loads(input)
+            data = toJSON(input)
             validate_input(data, schema)
             owned_domains = await self.solana_kit.get_owned_all_domains(data["owner"])
             return {"domains": owned_domains, "message": "Success"} if owned_domains else {"message": "No owned domains found"}
