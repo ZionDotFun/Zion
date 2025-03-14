@@ -1,124 +1,147 @@
-# Solana Token Analysis with RugCheck and Gemini 2.0 Flash
 
-This repository demonstrates how to analyze Solana tokens using data from RugCheck and the Gemini 2.0 Flash language model, leveraging the Agentipy framework.
+
+# RugCheck CLI Tool
+
+The **RugCheck CLI Tool** is a command-line interface (CLI) application that allows users to fetch and display RugCheck reports for tokens by entering their **Contract Address (CA)**. The tool uses the RugCheck API to provide detailed information about a token's risks, score, and LP lockers.
+
+---
+
+## Features
+
+- **Fetch RugCheck Reports**:
+  - Get a detailed report for a token, including its risk score, risks, and creator tokens.
+- **Fetch LP Lockers**:
+  - Retrieve information about the token's LP lockers and total locked value.
+- **User-Friendly Output**:
+  - Display results in an easy-to-read format.
+- **Error Handling**:
+  - Provide clear error messages for invalid inputs or API issues.
+
+---
 
 ## Prerequisites
 
-Before you begin, make sure you have the following:
+- Python 3.7 or higher.
+- An API key from [RugCheck](https://rugcheck.xyz/).
 
-1.  **Python 3.8+:** Ensure you have Python installed.
-2.  **Agentipy Installation:** You should have followed the installation instructions from the previous tutorials. If not, run:
+---
 
-    ```bash
-    pip install agentipy
-    pip install httpx
-    pip install tenacity
-    pip install langchain
-    pip install langchain-google-genai
-    ```
+## Installation
 
-3.  **Environment Variables:** Set the following environment variables:
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/yourusername/rugcheck-cli.git
+   cd rugcheck-cli
+   ```
 
-    *   `SOLANA_PRIVATE_KEY`: Your Solana wallet's private key (base58-encoded).  **IMPORTANT: Treat your private key with extreme care. Do not share it publicly.**
-    *   `RUGCHECK_API_KEY`: Your RugCheck API key. You'll need to sign up for an API key on their website.
-    *   `GOOGLE_API_KEY`: Your Google API Key, obtain it from Google Cloud Console.
-4.  **API Keys and Accounts:**
-    *   **RugCheck API Key:** Sign up for a RugCheck API key on their website: [https://rugcheck.xyz/](https://rugcheck.xyz/). You'll need an API key to access their token analysis data.
-    *   **Google API Key:** Obtain a Google API key from the Google Cloud Console: [https://console.cloud.google.com/](https://console.cloud.google.com/). Enable the Gemini 2.0 Flash API. You may need to set up billing.
+2. **Install Dependencies**:
+   ```bash
+   pip install aiohttp
+   ```
 
-## Files
+3. **Set Up Your API Key**:
+   - Replace `YOUR_API_KEY` in the `rugcheck_cli.py` script with your actual RugCheck API key.
 
-*   `rugcheck.py`:  The main Python script that performs the Solana token analysis.
+---
 
-## Code Overview
+## Usage
 
-The `rugcheck.py` script utilizes the Agentipy framework, RugCheck API, and Gemini 2.0 Flash to perform a comprehensive analysis of Solana tokens.  Here's a breakdown of the key components:
+Run the script from the command line:
 
-*   **Imports:** Imports necessary libraries including Agentipy components, httpx for API requests, tenacity for retries, and libraries for the Gemini API.
+```bash
+python rugcheck_cli.py
+```
 
-*   **Logging:** Sets up logging for debugging and informational purposes.
+### Example Inputs
 
-*   **Environment Variables and Gemini Initialization:** Retrieves API keys from environment variables and initializes the Gemini 2.0 Flash language model.
+- **Wrapped SOL (Solana)**:
+  ```
+  So11111111111111111111111111111111111111112
+  ```
 
-*   **Pydantic Models:** Defines Pydantic models (`TokenMeta`, `Token`, `Risks`, `CreatorToken`, `TokenCheck`) to structure and validate the data fetched from the RugCheck API, ensuring data integrity.
+- **USDC (Solana)**:
+  ```
+  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  ```
 
-*   **`RugCheckManager` Class:**  Manages interactions with the RugCheck API:
+- **Raydium (Solana)**:
+  ```
+  4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R
+  ```
 
-    *   `_make_request()`: Handles HTTP requests with retries.
-    *   `fetch_token_report_summary()`: Fetches a summary report.
-    *   `fetch_token_detailed_report()`: Fetches a detailed report.
-    *   `fetch_token_lp_lockers()`: Fetches LP locker information.
-    *   `get_trending_tokens()`: Get trending tokens.
+### Example Output
 
-*   **Custom Agentipy Tools:**
+#### Valid Input:
+```
+Enter the Contract Address (CA) of the token.
+Example CA: So11111111111111111111111111111111111111112 (Wrapped SOL)
+Your input: So11111111111111111111111111111111111111112
 
-    *   `TokenHolderAnalysisTool`: Analyzes token holder distribution.
-    *   `SolanaRugCheckTokenReportSummaryTool`: Fetches a summary report using RugCheck.
-    *   `SolanaRugCheckTokenDetailedReportTool`: Fetches a detailed report, includes Market Cap, symbol, and other metadata, and handles cases with missing data.
-    *   `TokenRiskAnalysisTool`: Uses Gemini 2.0 Flash to generate a risk analysis.
+Fetching RugCheck report...
 
-*   **`create_solana_tools()` Function:** Creates a list of Agentipy tools.
+Token Report for So11111111111111111111111111111111111111112:
+  - Program: None
+  - Type: None
+  - Risks: 0 risks found
+  - Score: 0/100
+  - Creator Tokens: None
 
-*   **`main()` Function:**
+LP Lockers:
+No LP lockers found for this token.
+```
 
-    *   Initializes the Solana Agent.
-    *   Gets user input for a token (ticker or contract address).
-    *   Uses `create_solana_tools()` to create and load tools.
-    *   Executes each tool to fetch summary reports, detailed reports, holder analysis, and risk analysis.
-    *   Prints the results to the console.
+#### Invalid Input:
+```
+Enter the Contract Address (CA) of the token.
+Example CA: So11111111111111111111111111111111111111112 (Wrapped SOL)
+Your input: SOL
 
-## Running the Script
+Fetching RugCheck report...
 
-1.  **Save the Code:** Save the code as `rugcheck.py`.
-2.  **Set Environment Variables:**
+Error: 400, message='Bad Request', url='https://api.rugcheck.xyz/v1/tokens/SOL/report/summary'
+Please ensure you entered a valid Contract Address (CA).
+Example CA: So11111111111111111111111111111111111111112 (Wrapped SOL)
+```
 
-    *   **Linux/macOS:**
-        ```bash
-        export SOLANA_PRIVATE_KEY='your_base58_private_key_here'
-        export RUGCHECK_API_KEY='your_rugcheck_api_key_here'
-        export GOOGLE_API_KEY='your_google_api_key_here'
-        ```
+---
 
-    *   **Windows (Command Prompt):**
-        ```bash
-        set SOLANA_PRIVATE_KEY=your_base58_private_key_here
-        set RUGCHECK_API_KEY=your_rugcheck_api_key_here
-        set GOOGLE_API_KEY=your_google_api_key_here
-        ```
+## Troubleshooting
 
-    *   **Windows (PowerShell):**
-        ```bash
-        $env:SOLANA_PRIVATE_KEY = 'your_base58_private_key_here'
-        $env:RUGCHECK_API_KEY = 'your_rugcheck_api_key_here'
-        $env:GOOGLE_API_KEY = 'your_google_api_key_here'
-        ```
+### Common Issues
 
-3.  **Run the Script:** Open a terminal and run:
-    ```bash
-    python rugcheck.py
-    ```
-4.  **Enter Token Information:** The script will prompt you for a token ticker or contract address.
+1. **Invalid Contract Address**:
+   - Ensure the contract address is valid and supported by the RugCheck API.
+   - Example: `So11111111111111111111111111111111111111112` (Wrapped SOL).
 
+2. **API Key Issues**:
+   - Ensure your API key is valid and has the necessary permissions.
 
-## Important Considerations
+3. **Network Issues**:
+   - Check your internet connection and ensure the RugCheck API is accessible.
 
-*   **API Rate Limits:** Be mindful of RugCheck's API rate limits.
-*   **Security:** Protect your `SOLANA_PRIVATE_KEY` and `RUGCHECK_API_KEY`.
-*   **Data Accuracy:** Verify results and cross-reference with other sources.
-*   **Cost:** Be aware of RugCheck and Gemini API costs.
+---
 
 ## Contributing
 
-We welcome contributions! See the [Contribution Guidelines](https://github.com/niceberginc/agentipy/blob/main/CONTRIBUTING.md).
+Contributions are welcome! If you'd like to improve this tool, please:
 
-## Resources and Further Reading
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Submit a pull request.
 
-*   [Agentipy GitHub Repository](https://github.com/niceberginc/agentipy)
-*   [RugCheck API Documentation](https://api.rugcheck.xyz/docs)
-*   [Gemini API Documentation](https://cloud.google.com/gemini/docs)
-*   [Solana Documentation](https://docs.solana.com/)
-*   [Agentipy Examples](https://github.com/niceberginc/agentipy/tree/main/examples)
+---
 
-## Contact
+## License
 
-Join the community on [X (@AgentiPy)](https://x.com/AgentiPy) to share your ideas and get support.  If you have questions or need help, reach out on [X (@AgentiPy)](https://x.com/AgentiPy) or open an issue on GitHub.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Acknowledgments
+
+- [RugCheck](https://rugcheck.xyz/) for providing the API.
+- [aiohttp](https://docs.aiohttp.org/) for enabling asynchronous HTTP requests.
+
+---
+
+Let me know if you need further assistance or additional features!
