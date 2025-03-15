@@ -1,4 +1,5 @@
 import aiohttp
+
 from agentipy.agent import SolanaAgentKit
 
 
@@ -6,7 +7,7 @@ class CoingeckoManager:
     @staticmethod
     async def get_trending_tokens(agent: SolanaAgentKit) -> dict:
         """
-        Get trending tokens from CoinGecko (Free endpoint).
+        Get trending tokens from Coingecko.
 
         Args:
             agent (SolanaAgentKit): The Solana agent instance.
@@ -15,11 +16,15 @@ class CoingeckoManager:
             dict: Trending tokens data.
         """
         try:
-            # Always use the free endpoint for trending tokens
-            url = "https://api.coingecko.com/api/v3/search/trending"
-            # Optionally add a demo key if provided (and no pro key is set)
-            if not agent.coingecko_api_key and agent.coingecko_demo_api_key:
-                url += f"?x_cg_demo_api_key={agent.coingecko_demo_api_key}"
+            if agent.coingecko_api_key:
+                url = (
+                    f"https://pro-api.coingecko.com/api/v3/search/trending"
+                    f"?x_cg_pro_api_key={agent.coingecko_api_key}"
+                )
+            else:
+                url = "https://api.coingecko.com/api/v3/search/trending"
+                if agent.coingecko_demo_api_key:
+                    url += f"?x_cg_demo_api_key={agent.coingecko_demo_api_key}"
             
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
@@ -33,7 +38,7 @@ class CoingeckoManager:
     @staticmethod
     async def get_trending_pools(agent: SolanaAgentKit, duration: str = "24h") -> dict:
         """
-        Get trending pools from CoinGecko for the Solana network (Pro endpoint).
+        Get trending pools from CoinGecko for the Solana network.
 
         Args:
             agent (SolanaAgentKit): The Solana agent instance.
@@ -48,12 +53,11 @@ class CoingeckoManager:
             
             url = (
                 "https://pro-api.coingecko.com/api/v3/onchain/networks/solana/trending_pools"
-                f"?include=base_token,network&duration={duration}"
+                f"?include=base_token,network&duration={duration}&x_cg_pro_api_key={agent.coingecko_api_key}"
             )
-            headers = {"x-cg-pro-api-key": agent.coingecko_api_key}
             
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url) as response:
                     if response.status != 200:
                         raise Exception(f"Failed to fetch trending pools: {response.status}")
                     data = await response.json()
@@ -68,7 +72,7 @@ class CoingeckoManager:
         top_coins: int | str = "all"  # Allowed values: 300, 500, 1000, or "all"
     ) -> dict:
         """
-        Get top gainers from CoinGecko (Pro endpoint).
+        Get top gainers from CoinGecko.
 
         Args:
             agent (SolanaAgentKit): The Solana agent instance.
@@ -85,11 +89,11 @@ class CoingeckoManager:
             url = (
                 "https://pro-api.coingecko.com/api/v3/coins/top_gainers_losers"
                 f"?vs_currency=usd&duration={duration}&top_coins={top_coins}"
+                f"&x_cg_pro_api_key={agent.coingecko_api_key}"
             )
-            headers = {"x-cg-pro-api-key": agent.coingecko_api_key}
             
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url) as response:
                     if response.status != 200:
                         raise Exception(f"Failed to fetch top gainers: {response.status}")
                     data = await response.json()
@@ -100,7 +104,7 @@ class CoingeckoManager:
     @staticmethod
     async def get_token_price_data(agent: SolanaAgentKit, token_addresses: list[str]) -> dict:
         """
-        Get token price data for a list of token addresses from CoinGecko (Free endpoint).
+        Get token price data for a list of token addresses from CoinGecko.
 
         Args:
             agent (SolanaAgentKit): The Solana agent instance.
@@ -111,17 +115,29 @@ class CoingeckoManager:
         """
         try:
             joined_addresses = ",".join(token_addresses)
-            url = (
-                "https://api.coingecko.com/api/v3/simple/token_price/solana"
-                f"?contract_addresses={joined_addresses}"
-                "&vs_currencies=usd"
-                "&include_market_cap=true"
-                "&include_24hr_vol=true"
-                "&include_24hr_change=true"
-                "&include_last_updated_at=true"
-            )
-            if not agent.coingecko_api_key and agent.coingecko_demo_api_key:
-                url += f"&x_cg_demo_api_key={agent.coingecko_demo_api_key}"
+            if agent.coingecko_api_key:
+                url = (
+                    "https://pro-api.coingecko.com/api/v3/simple/token_price/solana"
+                    f"?contract_addresses={joined_addresses}"
+                    "&vs_currencies=usd"
+                    "&include_market_cap=true"
+                    "&include_24hr_vol=true"
+                    "&include_24hr_change=true"
+                    "&include_last_updated_at=true"
+                    f"&x_cg_pro_api_key={agent.coingecko_api_key}"
+                )
+            else:
+                url = (
+                    "https://api.coingecko.com/api/v3/simple/token_price/solana"
+                    f"?contract_addresses={joined_addresses}"
+                    "&vs_currencies=usd"
+                    "&include_market_cap=true"
+                    "&include_24hr_vol=true"
+                    "&include_24hr_change=true"
+                    "&include_last_updated_at=true"
+                )
+                if agent.coingecko_demo_api_key:
+                    url += f"&x_cg_demo_api_key={agent.coingecko_demo_api_key}"
             
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
@@ -135,7 +151,7 @@ class CoingeckoManager:
     @staticmethod
     async def get_token_info(agent: SolanaAgentKit, token_address: str) -> dict:
         """
-        Get token info for a given token address from CoinGecko (Pro endpoint).
+        Get token info for a given token address from CoinGecko.
 
         Args:
             agent (SolanaAgentKit): The Solana agent instance.
@@ -148,11 +164,13 @@ class CoingeckoManager:
             if not agent.coingecko_api_key:
                 raise Exception("No CoinGecko Pro API key provided")
             
-            url = f"https://pro-api.coingecko.com/api/v3/onchain/networks/solana/tokens/{token_address}/info"
-            headers = {"x-cg-pro-api-key": agent.coingecko_api_key}
+            url = (
+                f"https://pro-api.coingecko.com/api/v3/onchain/networks/solana/tokens/{token_address}/info"
+                f"?x_cg_pro_api_key={agent.coingecko_api_key}"
+            )
             
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url) as response:
                     if response.status != 200:
                         raise Exception(f"Failed to fetch token info: {response.status}")
                     data = await response.json()
@@ -163,7 +181,7 @@ class CoingeckoManager:
     @staticmethod
     async def get_latest_pools(agent: SolanaAgentKit) -> dict:
         """
-        Get the latest pools from CoinGecko for the Solana network (Pro endpoint).
+        Get the latest pools from CoinGecko for the Solana network.
 
         Args:
             agent (SolanaAgentKit): The Solana agent instance.
@@ -177,12 +195,11 @@ class CoingeckoManager:
             
             url = (
                 "https://pro-api.coingecko.com/api/v3/onchain/networks/solana/new_pools"
-                f"?include=base_token,network"
+                f"?include=base_token,network&x_cg_pro_api_key={agent.coingecko_api_key}"
             )
-            headers = {"x-cg-pro-api-key": agent.coingecko_api_key}
             
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url) as response:
                     if response.status != 200:
                         raise Exception(f"Failed to fetch latest pools: {response.status}")
                     data = await response.json()
