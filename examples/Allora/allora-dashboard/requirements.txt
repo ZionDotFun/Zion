@@ -1,4 +1,1 @@
-agentipy
-allora-sdk
-flask
-python-dotenv
+/var/folders/15/5nqgf_n51czb2vfntylx44tw4mppxx/T/repo_cache/7e02e1f8caefd56b36cfa036bd89c5a3
