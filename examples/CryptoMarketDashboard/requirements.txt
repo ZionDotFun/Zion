@@ -1,3 +1,1 @@
-aiohttp
-python-dotenv
-agentipy
+/var/folders/15/5nqgf_n51czb2vfntylx44tw4mppxx/T/repo_cache/b498f0c03f541b594575d0c657eba447
