@@ -2,8 +2,7 @@ import logging
 
 from solana.rpc.api import Client
 from solana.rpc.types import TxOpts
-#from solana.transaction import Transaction
-from solders.transaction import Transaction
+from solana.transaction import Transaction
 from solders.compute_budget import set_compute_unit_limit  # type: ignore
 from solders.compute_budget import set_compute_unit_price  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
@@ -15,6 +14,10 @@ from agentipy.agent import SolanaAgentKit
 
 # Configure logger for this module
 logger = logging.getLogger(__name__)
+
+class BurnValues:
+    DEFAULT_COMPUTE_UNIT_PRICE = 100_000
+    DEFAULT_COMPUTE_UNIT_LIMIT = 100_000
 
 class BurnManager:
     @staticmethod
@@ -69,8 +72,8 @@ class BurnManager:
                 owner=owner
             )
         )
-        transaction.add(set_compute_unit_price(100_000))
-        transaction.add(set_compute_unit_limit(100_000))
+        transaction.add(set_compute_unit_price(BurnValues.DEFAULT_COMPUTE_UNIT_PRICE))
+        transaction.add(set_compute_unit_limit(BurnValues.DEFAULT_COMPUTE_UNIT_LIMIT))
         transaction.add(close_account_instruction)
 
         try:
