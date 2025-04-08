@@ -1,9 +1,7 @@
-from struct import Struct
-from typing import Any, Callable, Dict, List, Optional
-
-from construct import Flag, Int64ul
+from typing import Dict, List, Optional
 from pydantic import BaseModel, field_validator
 from solders.pubkey import Pubkey  # type: ignore
+from construct import Struct, Int64ul, Flag
 
 
 class BaseModelWithArbitraryTypes(BaseModel):
@@ -209,4 +207,3 @@ class BondingCurveState:
     def __init__(self, data: bytes) -> None:
         parsed = self._STRUCT.parse(data[8:])
         self.__dict__.update(parsed)
-
