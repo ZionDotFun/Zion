@@ -41,7 +41,6 @@ class GibworkManager:
                 headers={"Content-Type": "application/json"},
                 json=payload,
             )
-            response.raise_for_status()
             response_data = response.json()
 
             if not response_data.get("taskId") or not response_data.get("serializedTransaction"):
